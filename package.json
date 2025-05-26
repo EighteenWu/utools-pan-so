@@ -1,0 +1,19 @@
+{
+  "name": "97panso-utools",
+  "version": "0.0.1",
+  "description": "97网盘资源搜索 uTools插件",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.0"
+  }
+}

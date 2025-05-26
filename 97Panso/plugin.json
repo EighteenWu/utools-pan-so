@@ -1,0 +1,22 @@
+{
+  "pluginName": "97网盘资源搜索",
+  "description": "搜索百度网盘、夸克网盘、阿里云盘、迅雷网盘等资源",
+  "version": "1.0.0",
+  "author": "EighteenWu",
+  "main": "index.html",
+  "preload": "preload.js",
+  "logo": "logo.png",
+  "pluginSetting": {
+    "height": 932,
+    "width": 430,
+    "single": true,
+    "resizable": false
+  },
+  "features": [
+    {
+      "code": "97panso",
+      "explain": "搜索百度网盘、夸克网盘、阿里云盘、迅雷网盘等资源",
+      "cmds": ["97", "网盘", "网盘搜索", "资源搜索", "pan", "盘搜"]
+    }
+  ]
+}

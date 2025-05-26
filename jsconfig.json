@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["ES2015", "DOM", "ES2015.Promise", "ES2015.Iterable"]
+  },
+  "include": [
+    "src/**/*.jsx",
+    "src/**/*.js"
+  ]
+}
