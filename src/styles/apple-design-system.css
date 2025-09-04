@@ -1,0 +1,931 @@
+/* Apple Design System - 基础样式系统 */
+/* 替代AI科技感设计，采用苹果官方设计语言 */
+
+:root {
+  /* === 苹果设计系统颜色变量 === */
+  
+  /* 主要颜色 - Apple System Colors */
+  --apple-blue: #007AFF;           /* 系统蓝色 - 主要操作按钮、链接、选中状态 */
+  --apple-green: #34C759;          /* 系统绿色 - 成功状态、开关激活 */
+  --apple-orange: #FF9500;         /* 系统橙色 - 警告状态 */
+  --apple-red: #FF3B30;            /* 系统红色 - 错误状态、删除操作 */
+  --apple-purple: #AF52DE;         /* 系统紫色 - 特殊标记 */
+  --apple-pink: #FF2D92;           /* 系统粉色 - 强调元素 */
+  --apple-teal: #5AC8FA;           /* 系统青色 - 信息提示 */
+  --apple-indigo: #5856D6;         /* 系统靛蓝 - 次要操作 */
+
+  /* 中性色系 - Apple Gray Scale */
+  --apple-gray-1: #8E8E93;         /* 次要文本、未选中状态 */
+  --apple-gray-2: #AEAEB2;         /* 占位符文本 */
+  --apple-gray-3: #C7C7CC;         /* 分隔线、边框 */
+  --apple-gray-4: #D1D1D6;         /* 输入框边框 */
+  --apple-gray-5: #E5E5EA;         /* 卡片边框 */
+  --apple-gray-6: #F2F2F7;         /* 背景色、分组背景 */
+
+  /* 背景颜色 - Apple Background Colors */
+  --apple-bg-primary: #FFFFFF;     /* 主背景 - 纯白色 */
+  --apple-bg-secondary: #F2F2F7;   /* 次要背景 - 浅灰色 */
+  --apple-bg-tertiary: #FFFFFF;    /* 卡片背景 - 纯白色 */
+  --apple-bg-grouped: #F2F2F7;     /* 分组区域背景 */
+
+  /* 文本颜色 - Apple Text Colors */
+  --apple-text-primary: #000000;   /* 主要文本 */
+  --apple-text-secondary: #3C3C43; /* 次要文本 */
+  --apple-text-tertiary: #3C3C4399; /* 第三级文本 (60% opacity) */
+  --apple-text-quaternary: #3C3C4333; /* 第四级文本 (20% opacity) */
+  --apple-text-placeholder: #3C3C434D; /* 占位符文本 (30% opacity) */
+
+  /* === 苹果字体系统 === */
+  
+  /* 字体栈 - Apple Font Stack */
+  --apple-font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  
+  /* 字体大小 - Apple Typography Scale */
+  --apple-font-size-large-title: 34px;    /* 大标题 */
+  --apple-font-size-title-1: 28px;        /* 标题1 */
+  --apple-font-size-title-2: 22px;        /* 标题2 */
+  --apple-font-size-title-3: 20px;        /* 标题3 */
+  --apple-font-size-headline: 17px;       /* 标题文本 */
+  --apple-font-size-body: 17px;           /* 正文 */
+  --apple-font-size-callout: 16px;        /* 说明文字 */
+  --apple-font-size-subhead: 15px;        /* 副标题 */
+  --apple-font-size-footnote: 13px;       /* 脚注 */
+  --apple-font-size-caption-1: 12px;      /* 说明文字1 */
+  --apple-font-size-caption-2: 11px;      /* 说明文字2 */
+
+  /* 字体粗细 - Apple Font Weights */
+  --apple-font-weight-ultralight: 100;
+  --apple-font-weight-thin: 200;
+  --apple-font-weight-light: 300;
+  --apple-font-weight-regular: 400;
+  --apple-font-weight-medium: 500;
+  --apple-font-weight-semibold: 600;
+  --apple-font-weight-bold: 700;
+  --apple-font-weight-heavy: 800;
+  --apple-font-weight-black: 900;
+
+  /* 行高 - Apple Line Heights */
+  --apple-line-height-tight: 1.2;
+  --apple-line-height-normal: 1.4;
+  --apple-line-height-relaxed: 1.6;
+
+  /* === 苹果间距系统 === */
+  
+  /* 基础间距单位 - Apple Spacing Scale */
+  --apple-spacing-1: 4px;          /* 最小间距 */
+  --apple-spacing-2: 8px;          /* 小间距 */
+  --apple-spacing-3: 12px;         /* 中小间距 */
+  --apple-spacing-4: 16px;         /* 标准间距 */
+  --apple-spacing-5: 20px;         /* 中等间距 */
+  --apple-spacing-6: 24px;         /* 大间距 */
+  --apple-spacing-7: 28px;         /* 较大间距 */
+  --apple-spacing-8: 32px;         /* 大间距 */
+  --apple-spacing-9: 36px;         /* 很大间距 */
+  --apple-spacing-10: 40px;        /* 最大间距 */
+
+  /* 组件间距 - Apple Component Spacing */
+  --apple-component-margin: var(--apple-spacing-4);     /* 组件外边距 */
+  --apple-component-padding: var(--apple-spacing-5);    /* 组件内边距 */
+  --apple-content-margin: var(--apple-spacing-5);       /* 内容边距 */
+
+  /* === 苹果圆角系统 === */
+  
+  /* 圆角半径 - Apple Border Radius */
+  --apple-radius-small: 6px;       /* 小圆角 - 标签、小按钮 */
+  --apple-radius-medium: 8px;      /* 中圆角 - 按钮、输入框 */
+  --apple-radius-large: 10px;      /* 大圆角 - 搜索框 */
+  --apple-radius-card: 12px;       /* 卡片圆角 */
+  --apple-radius-modal: 14px;      /* 模态框圆角 */
+  --apple-radius-full: 999px;      /* 完全圆角 - 胶囊按钮 */
+
+  /* === 苹果阴影系统 === */
+  
+  /* 阴影效果 - Apple Shadows */
+  --apple-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.1);      /* 轻微阴影 */
+  --apple-shadow-2: 0 2px 6px rgba(0, 0, 0, 0.1);      /* 标准阴影 */
+  --apple-shadow-3: 0 4px 12px rgba(0, 0, 0, 0.1);     /* 中等阴影 */
+  --apple-shadow-4: 0 8px 24px rgba(0, 0, 0, 0.1);     /* 较大阴影 */
+  --apple-shadow-5: 0 16px 48px rgba(0, 0, 0, 0.1);    /* 大阴影 */
+
+  /* 焦点阴影 - Apple Focus Shadows */
+  --apple-shadow-focus: 0 0 0 2px var(--apple-blue);   /* 焦点状态阴影 */
+  --apple-shadow-focus-ring: 0 0 0 4px rgba(0, 122, 255, 0.3); /* 焦点环 */
+
+  /* === 苹果动画系统 === */
+  
+  /* 动画时长 - Apple Animation Durations */
+  --apple-duration-fast: 0.15s;    /* 快速动画 */
+  --apple-duration-normal: 0.25s;  /* 标准动画 */
+  --apple-duration-slow: 0.35s;    /* 慢速动画 */
+
+  /* 动画缓动 - Apple Animation Easings */
+  --apple-ease-in: cubic-bezier(0.42, 0, 1, 1);
+  --apple-ease-out: cubic-bezier(0, 0, 0.58, 1);
+  --apple-ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+  --apple-ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+
+  /* === 苹果交互元素尺寸 === */
+  
+  /* 按钮高度 - Apple Button Heights */
+  --apple-button-height-small: 32px;    /* 小按钮 */
+  --apple-button-height-medium: 40px;   /* 中等按钮 */
+  --apple-button-height-large: 44px;    /* 大按钮 - iOS标准触摸目标 */
+
+  /* 输入框高度 - Apple Input Heights */
+  --apple-input-height-small: 32px;     /* 小输入框 */
+  --apple-input-height-medium: 40px;    /* 中等输入框 */
+  --apple-input-height-large: 44px;     /* 大输入框 */
+
+  /* === 苹果Z-Index层级 === */
+  
+  /* Z-Index层级 - Apple Z-Index Scale */
+  --apple-z-dropdown: 1000;
+  --apple-z-sticky: 1020;
+  --apple-z-fixed: 1030;
+  --apple-z-modal-backdrop: 1040;
+  --apple-z-modal: 1050;
+  --apple-z-popover: 1060;
+  --apple-z-tooltip: 1070;
+  --apple-z-toast: 1080;
+}
+
+/* === 苹果设计系统工具类 === */
+
+/* 字体工具类 - Apple Typography Utilities */
+.apple-font-large-title {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-large-title);
+  font-weight: var(--apple-font-weight-bold);
+  line-height: var(--apple-line-height-tight);
+}
+
+.apple-font-title-1 {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-title-1);
+  font-weight: var(--apple-font-weight-bold);
+  line-height: var(--apple-line-height-tight);
+}
+
+.apple-font-title-2 {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-title-2);
+  font-weight: var(--apple-font-weight-semibold);
+  line-height: var(--apple-line-height-normal);
+}
+
+.apple-font-title-3 {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-title-3);
+  font-weight: var(--apple-font-weight-semibold);
+  line-height: var(--apple-line-height-normal);
+}
+
+.apple-font-headline {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-headline);
+  font-weight: var(--apple-font-weight-semibold);
+  line-height: var(--apple-line-height-normal);
+}
+
+.apple-font-body {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  font-weight: var(--apple-font-weight-regular);
+  line-height: var(--apple-line-height-normal);
+}
+
+.apple-font-callout {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-callout);
+  font-weight: var(--apple-font-weight-regular);
+  line-height: var(--apple-line-height-normal);
+}
+
+.apple-font-subhead {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-subhead);
+  font-weight: var(--apple-font-weight-regular);
+  line-height: var(--apple-line-height-normal);
+}
+
+.apple-font-footnote {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-footnote);
+  font-weight: var(--apple-font-weight-regular);
+  line-height: var(--apple-line-height-normal);
+}
+
+.apple-font-caption {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-caption-1);
+  font-weight: var(--apple-font-weight-regular);
+  line-height: var(--apple-line-height-normal);
+}
+
+/* 颜色工具类 - Apple Color Utilities */
+.apple-text-primary { color: var(--apple-text-primary); }
+.apple-text-secondary { color: var(--apple-text-secondary); }
+.apple-text-tertiary { color: var(--apple-text-tertiary); }
+.apple-text-blue { color: var(--apple-blue); }
+.apple-text-green { color: var(--apple-green); }
+.apple-text-red { color: var(--apple-red); }
+
+.apple-bg-primary { background-color: var(--apple-bg-primary); }
+.apple-bg-secondary { background-color: var(--apple-bg-secondary); }
+.apple-bg-blue { background-color: var(--apple-blue); }
+.apple-bg-green { background-color: var(--apple-green); }
+
+/* 间距工具类 - Apple Spacing Utilities */
+.apple-m-1 { margin: var(--apple-spacing-1); }
+.apple-m-2 { margin: var(--apple-spacing-2); }
+.apple-m-3 { margin: var(--apple-spacing-3); }
+.apple-m-4 { margin: var(--apple-spacing-4); }
+.apple-m-5 { margin: var(--apple-spacing-5); }
+
+.apple-p-1 { padding: var(--apple-spacing-1); }
+.apple-p-2 { padding: var(--apple-spacing-2); }
+.apple-p-3 { padding: var(--apple-spacing-3); }
+.apple-p-4 { padding: var(--apple-spacing-4); }
+.apple-p-5 { padding: var(--apple-spacing-5); }
+
+.apple-mb-1 { margin-bottom: var(--apple-spacing-1); }
+.apple-mb-2 { margin-bottom: var(--apple-spacing-2); }
+.apple-mb-3 { margin-bottom: var(--apple-spacing-3); }
+.apple-mb-4 { margin-bottom: var(--apple-spacing-4); }
+.apple-mb-5 { margin-bottom: var(--apple-spacing-5); }
+
+/* 圆角工具类 - Apple Border Radius Utilities */
+.apple-radius-small { border-radius: var(--apple-radius-small); }
+.apple-radius-medium { border-radius: var(--apple-radius-medium); }
+.apple-radius-large { border-radius: var(--apple-radius-large); }
+.apple-radius-card { border-radius: var(--apple-radius-card); }
+.apple-radius-full { border-radius: var(--apple-radius-full); }
+
+/* 阴影工具类 - Apple Shadow Utilities */
+.apple-shadow-1 { box-shadow: var(--apple-shadow-1); }
+.apple-shadow-2 { box-shadow: var(--apple-shadow-2); }
+.apple-shadow-3 { box-shadow: var(--apple-shadow-3); }
+.apple-shadow-4 { box-shadow: var(--apple-shadow-4); }
+
+/* === 苹果按钮组件样式 === */
+
+/* 主要按钮 - Apple Primary Button */
+.apple-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--apple-button-height-large);
+  padding: 0 var(--apple-spacing-5);
+  background-color: var(--apple-blue);
+  color: var(--apple-bg-primary);
+  border: none;
+  border-radius: var(--apple-radius-medium);
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  font-weight: var(--apple-font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--apple-duration-fast) var(--apple-ease-standard);
+  outline: none;
+}
+
+.apple-button-primary:hover:not(:disabled) {
+  background-color: #0056CC;
+  transform: translateY(-1px);
+  box-shadow: var(--apple-shadow-2);
+}
+
+.apple-button-primary:active:not(:disabled) {
+  background-color: #004499;
+  transform: translateY(0);
+  box-shadow: var(--apple-shadow-1);
+}
+
+.apple-button-primary:focus-visible {
+  box-shadow: var(--apple-shadow-focus-ring);
+}
+
+.apple-button-primary:disabled {
+  background-color: var(--apple-gray-3);
+  color: var(--apple-gray-1);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 次要按钮 - Apple Secondary Button */
+.apple-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--apple-button-height-large);
+  padding: 0 var(--apple-spacing-5);
+  background-color: var(--apple-bg-primary);
+  color: var(--apple-blue);
+  border: 1px solid var(--apple-gray-4);
+  border-radius: var(--apple-radius-medium);
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  font-weight: var(--apple-font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--apple-duration-fast) var(--apple-ease-standard);
+  outline: none;
+}
+
+.apple-button-secondary:hover:not(:disabled) {
+  background-color: var(--apple-bg-secondary);
+  border-color: var(--apple-gray-3);
+  transform: translateY(-1px);
+  box-shadow: var(--apple-shadow-1);
+}
+
+.apple-button-secondary:active:not(:disabled) {
+  background-color: var(--apple-gray-6);
+  transform: translateY(0);
+}
+
+.apple-button-secondary:focus-visible {
+  border-color: var(--apple-blue);
+  box-shadow: var(--apple-shadow-focus-ring);
+}
+
+/* === 苹果输入框组件样式 === */
+
+/* 标准输入框 - Apple Input Field */
+.apple-input {
+  width: 100%;
+  height: var(--apple-input-height-large);
+  padding: 0 var(--apple-spacing-4);
+  background-color: var(--apple-bg-primary);
+  border: 1px solid var(--apple-gray-4);
+  border-radius: var(--apple-radius-large);
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  font-weight: var(--apple-font-weight-regular);
+  color: var(--apple-text-primary);
+  outline: none;
+  transition: all var(--apple-duration-fast) var(--apple-ease-standard);
+}
+
+.apple-input::placeholder {
+  color: var(--apple-text-placeholder);
+  font-weight: var(--apple-font-weight-regular);
+}
+
+.apple-input:focus {
+  border-color: var(--apple-blue);
+  box-shadow: var(--apple-shadow-focus);
+  background-color: var(--apple-bg-primary);
+}
+
+.apple-input:disabled {
+  background-color: var(--apple-bg-secondary);
+  color: var(--apple-gray-1);
+  cursor: not-allowed;
+}
+
+/* === 苹果卡片组件样式 === */
+
+/* 标准卡片 - Apple Card */
+.apple-card {
+  background-color: var(--apple-bg-primary);
+  border-radius: var(--apple-radius-card);
+  box-shadow: var(--apple-shadow-1);
+  border: 1px solid var(--apple-gray-5);
+  transition: all var(--apple-duration-normal) var(--apple-ease-standard);
+}
+
+.apple-card:hover {
+  box-shadow: var(--apple-shadow-2);
+  transform: translateY(-1px);
+}
+
+/* === 苹果分段控制器样式 === */
+
+/* 分段控制器 - Apple Segmented Control */
+.apple-segmented-control {
+  display: inline-flex;
+  background-color: var(--apple-bg-secondary);
+  border-radius: var(--apple-radius-medium);
+  padding: 2px;
+  gap: 0;
+}
+
+.apple-segmented-control-item {
+  padding: var(--apple-spacing-2) var(--apple-spacing-4);
+  background-color: transparent;
+  color: var(--apple-text-primary);
+  border: none;
+  border-radius: var(--apple-radius-small);
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-subhead);
+  font-weight: var(--apple-font-weight-medium);
+  cursor: pointer;
+  transition: all var(--apple-duration-fast) var(--apple-ease-standard);
+  outline: none;
+}
+
+.apple-segmented-control-item.active {
+  background-color: var(--apple-bg-primary);
+  color: var(--apple-text-primary);
+  box-shadow: var(--apple-shadow-1);
+  font-weight: var(--apple-font-weight-semibold);
+}
+
+.apple-segmented-control-item:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* === 苹果开关组件样式 === */
+
+/* iOS风格开关 - Apple Switch */
+.apple-switch {
+  position: relative;
+  display: inline-block;
+  width: 51px;
+  height: 31px;
+}
+
+.apple-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.apple-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--apple-gray-3);
+  transition: var(--apple-duration-normal);
+  border-radius: 31px;
+}
+
+.apple-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 27px;
+  width: 27px;
+  left: 2px;
+  bottom: 2px;
+  background-color: var(--apple-bg-primary);
+  transition: var(--apple-duration-normal);
+  border-radius: 50%;
+  box-shadow: var(--apple-shadow-1);
+}
+
+.apple-switch input:checked + .apple-switch-slider {
+  background-color: var(--apple-green);
+}
+
+.apple-switch input:checked + .apple-switch-slider:before {
+  transform: translateX(20px);
+}
+
+/* === 响应式设计系统 === */
+
+/* 响应式断点定义 - Apple Design Guidelines */
+/*
+  - 1200px+: 大屏桌面 (Large Desktop)
+  - 992px-1199px: 桌面 (Desktop)
+  - 768px-991px: 平板 (Tablet)
+  - 576px-767px: 大手机 (Large Mobile)
+  - 320px-575px: 小手机 (Small Mobile)
+  - <320px: 超小屏 (Extra Small)
+*/
+
+/* === 大屏桌面优化 (1200px+) === */
+@media (min-width: 1200px) {
+  :root {
+    /* 增大间距以利用更多空间 */
+    --apple-component-margin: var(--apple-spacing-6);
+    --apple-component-padding: var(--apple-spacing-6);
+    --apple-content-margin: var(--apple-spacing-6);
+    
+    /* 增大字体以提高可读性 */
+    --apple-font-size-large-title: 40px;
+    --apple-font-size-title-1: 32px;
+    --apple-font-size-title-2: 24px;
+  }
+  
+  /* 容器最大宽度限制 */
+  .container {
+    max-width: 1200px;
+    padding: var(--apple-spacing-6);
+  }
+  
+  /* 大屏下的卡片布局优化 */
+  .apple-card {
+    padding: var(--apple-spacing-6);
+  }
+  
+  /* 筛选面板在大屏下的优化 */
+  .filter-panel-content {
+    padding: var(--apple-spacing-6);
+  }
+  
+  .filter-section {
+    margin-bottom: var(--apple-spacing-6);
+  }
+}
+
+/* === 桌面设备优化 (992px-1199px) === */
+@media (min-width: 992px) and (max-width: 1199px) {
+  :root {
+    --apple-component-margin: var(--apple-spacing-5);
+    --apple-component-padding: var(--apple-spacing-5);
+    --apple-content-margin: var(--apple-spacing-5);
+  }
+  
+  .container {
+    max-width: 960px;
+    padding: var(--apple-spacing-5);
+  }
+}
+
+/* === 平板设备适配 (768px-991px) === */
+@media (min-width: 768px) and (max-width: 991px) {
+  :root {
+    --apple-component-margin: var(--apple-spacing-4);
+    --apple-component-padding: var(--apple-spacing-4);
+    --apple-content-margin: var(--apple-spacing-4);
+  }
+  
+  .container {
+    max-width: 720px;
+    padding: var(--apple-spacing-4);
+  }
+  
+  /* 平板下的按钮和输入框优化 */
+  .apple-button-primary,
+  .apple-button-secondary {
+    height: var(--apple-button-height-large);
+    font-size: var(--apple-font-size-body);
+    padding: 0 var(--apple-spacing-4);
+  }
+  
+  .apple-input {
+    height: var(--apple-input-height-large);
+    font-size: var(--apple-font-size-body);
+    padding: 0 var(--apple-spacing-4);
+  }
+  
+  /* 分段控制器在平板下的优化 */
+  .apple-segmented-control-item {
+    padding: var(--apple-spacing-2) var(--apple-spacing-3);
+    font-size: var(--apple-font-size-subhead);
+  }
+}
+
+/* === 大手机设备适配 (576px-767px) === */
+@media (min-width: 576px) and (max-width: 767px) {
+  :root {
+    --apple-component-margin: var(--apple-spacing-3);
+    --apple-component-padding: var(--apple-spacing-4);
+    --apple-content-margin: var(--apple-spacing-4);
+    
+    /* 调整字体大小以适应中等屏幕 */
+    --apple-font-size-large-title: 30px;
+    --apple-font-size-title-1: 24px;
+    --apple-font-size-title-2: 20px;
+  }
+  
+  .container {
+    padding: var(--apple-spacing-4);
+  }
+  
+  /* 按钮和输入框适配 */
+  .apple-button-primary,
+  .apple-button-secondary {
+    height: var(--apple-button-height-medium);
+    font-size: var(--apple-font-size-callout);
+    padding: 0 var(--apple-spacing-4);
+  }
+  
+  .apple-input {
+    height: var(--apple-input-height-medium);
+    font-size: var(--apple-font-size-callout);
+    padding: 0 var(--apple-spacing-3);
+  }
+  
+  /* 卡片间距调整 */
+  .apple-card {
+    padding: var(--apple-spacing-4);
+    margin-bottom: var(--apple-spacing-3);
+  }
+}
+
+/* === 小手机设备适配 (320px-575px) === */
+@media (min-width: 320px) and (max-width: 575px) {
+  :root {
+    --apple-component-margin: var(--apple-spacing-2);
+    --apple-component-padding: var(--apple-spacing-3);
+    --apple-content-margin: var(--apple-spacing-3);
+    
+    /* 进一步缩小字体以适应小屏 */
+    --apple-font-size-large-title: 28px;
+    --apple-font-size-title-1: 22px;
+    --apple-font-size-title-2: 18px;
+    --apple-font-size-title-3: 16px;
+  }
+  
+  .container {
+    padding: var(--apple-spacing-3);
+  }
+  
+  /* 小屏下的按钮和输入框 */
+  .apple-button-primary,
+  .apple-button-secondary {
+    height: var(--apple-button-height-medium);
+    font-size: var(--apple-font-size-subhead);
+    padding: 0 var(--apple-spacing-3);
+  }
+  
+  .apple-input {
+    height: var(--apple-input-height-medium);
+    font-size: var(--apple-font-size-subhead);
+    padding: 0 var(--apple-spacing-3);
+  }
+  
+  /* 卡片在小屏下的优化 */
+  .apple-card {
+    padding: var(--apple-spacing-3);
+    margin-bottom: var(--apple-spacing-3);
+    border-radius: var(--apple-radius-medium);
+  }
+  
+  /* 分段控制器在小屏下的优化 */
+  .apple-segmented-control-item {
+    padding: var(--apple-spacing-1) var(--apple-spacing-2);
+    font-size: var(--apple-font-size-footnote);
+  }
+  
+  /* 开关组件在小屏下的调整 */
+  .apple-switch {
+    width: 44px;
+    height: 26px;
+  }
+  
+  .apple-switch-slider:before {
+    height: 22px;
+    width: 22px;
+  }
+  
+  .apple-switch input:checked + .apple-switch-slider:before {
+    transform: translateX(18px);
+  }
+}
+
+/* === 超小屏设备适配 (<320px) === */
+@media (max-width: 319px) {
+  :root {
+    --apple-component-margin: var(--apple-spacing-1);
+    --apple-component-padding: var(--apple-spacing-2);
+    --apple-content-margin: var(--apple-spacing-2);
+    
+    /* 最小字体设置 */
+    --apple-font-size-large-title: 24px;
+    --apple-font-size-title-1: 20px;
+    --apple-font-size-title-2: 16px;
+    --apple-font-size-title-3: 14px;
+    --apple-font-size-body: 14px;
+    --apple-font-size-callout: 14px;
+    --apple-font-size-subhead: 13px;
+  }
+  
+  .container {
+    padding: var(--apple-spacing-2);
+  }
+  
+  /* 超小屏下的按钮和输入框 */
+  .apple-button-primary,
+  .apple-button-secondary {
+    height: var(--apple-button-height-small);
+    font-size: var(--apple-font-size-footnote);
+    padding: 0 var(--apple-spacing-2);
+  }
+  
+  .apple-input {
+    height: var(--apple-input-height-small);
+    font-size: var(--apple-font-size-footnote);
+    padding: 0 var(--apple-spacing-2);
+  }
+  
+  /* 卡片在超小屏下的最小化设计 */
+  .apple-card {
+    padding: var(--apple-spacing-2);
+    margin-bottom: var(--apple-spacing-2);
+    border-radius: var(--apple-radius-small);
+  }
+  
+  /* 分段控制器在超小屏下垂直布局 */
+  .apple-segmented-control {
+    flex-direction: column;
+    gap: 1px;
+  }
+  
+  .apple-segmented-control-item {
+    padding: var(--apple-spacing-1);
+    font-size: var(--apple-font-size-caption-1);
+    border-radius: 0;
+  }
+  
+  .apple-segmented-control-item:first-child {
+    border-radius: var(--apple-radius-small) var(--apple-radius-small) 0 0;
+  }
+  
+  .apple-segmented-control-item:last-child {
+    border-radius: 0 0 var(--apple-radius-small) var(--apple-radius-small);
+  }
+}
+
+/* === 横屏模式优化 === */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    /* 横屏时减少垂直间距 */
+    --apple-component-margin: var(--apple-spacing-2);
+    --apple-content-margin: var(--apple-spacing-2);
+  }
+  
+  .container {
+    padding: var(--apple-spacing-2) var(--apple-spacing-4);
+  }
+  
+  /* 横屏时的卡片优化 */
+  .apple-card {
+    margin-bottom: var(--apple-spacing-2);
+  }
+  
+  /* 横屏时的按钮高度调整 */
+  .apple-button-primary,
+  .apple-button-secondary {
+    height: var(--apple-button-height-small);
+  }
+  
+  .apple-input {
+    height: var(--apple-input-height-small);
+  }
+}
+
+/* === 触摸设备优化 === */
+@media (pointer: coarse) {
+  /* 增大触摸目标以符合iOS人机界面指南 */
+  .apple-button-primary,
+  .apple-button-secondary {
+    min-height: 44px; /* iOS最小触摸目标 */
+    min-width: 44px;
+  }
+  
+  .apple-segmented-control-item {
+    min-height: 44px;
+    padding: var(--apple-spacing-2) var(--apple-spacing-4);
+  }
+  
+  .apple-switch {
+    min-width: 51px;
+    min-height: 31px;
+  }
+  
+  /* 增大可点击区域 */
+  .apple-card {
+    cursor: pointer;
+  }
+  
+  /* 触摸反馈优化 */
+  .apple-button-primary:active,
+  .apple-button-secondary:active {
+    transform: scale(0.98);
+  }
+}
+
+/* === 高分辨率屏幕优化 === */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* 高分辨率下的边框优化 */
+  .apple-card,
+  .apple-input,
+  .apple-button-secondary {
+    border-width: 0.5px;
+  }
+  
+  /* 高分辨率下的阴影优化 */
+  :root {
+    --apple-shadow-1: 0 0.5px 1.5px rgba(0, 0, 0, 0.1);
+    --apple-shadow-2: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --apple-shadow-3: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* === 深色模式响应式优化 === */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* 深色模式下的颜色调整 */
+    --apple-bg-primary: #000000;
+    --apple-bg-secondary: #1C1C1E;
+    --apple-bg-tertiary: #2C2C2E;
+    --apple-bg-grouped: #1C1C1E;
+    
+    --apple-text-primary: #FFFFFF;
+    --apple-text-secondary: #EBEBF5;
+    --apple-text-tertiary: #EBEBF599;
+    --apple-text-quaternary: #EBEBF54D;
+    --apple-text-placeholder: #EBEBF54D;
+    
+    --apple-gray-1: #8E8E93;
+    --apple-gray-2: #636366;
+    --apple-gray-3: #48484A;
+    --apple-gray-4: #3A3A3C;
+    --apple-gray-5: #2C2C2E;
+    --apple-gray-6: #1C1C1E;
+  }
+  
+  /* 深色模式下的阴影调整 */
+  .apple-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  
+  .apple-card:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* === 减少动画偏好支持 === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* 保留必要的焦点指示器 */
+  .apple-button-primary:focus-visible,
+  .apple-button-secondary:focus-visible,
+  .apple-input:focus {
+    transition: box-shadow 0.15s ease;
+  }
+}
+
+/* === 高对比度模式支持 === */
+@media (prefers-contrast: high) {
+  :root {
+    /* 增强对比度 */
+    --apple-text-primary: #000000;
+    --apple-text-secondary: #1D1D1F;
+    --apple-bg-primary: #FFFFFF;
+    --apple-border-color: #000000;
+  }
+  
+  .apple-card,
+  .apple-input,
+  .apple-button-secondary {
+    border-width: 2px;
+    border-color: var(--apple-border-color);
+  }
+  
+  .apple-button-primary {
+    background-color: #000000;
+    color: #FFFFFF;
+  }
+  
+  /* 高对比度下的焦点指示器 */
+  .apple-button-primary:focus-visible,
+  .apple-button-secondary:focus-visible,
+  .apple-input:focus {
+    outline: 3px solid #000000;
+    outline-offset: 2px;
+  }
+}
+
+/* === 打印样式优化 === */
+@media print {
+  :root {
+    /* 打印时使用黑白色彩 */
+    --apple-text-primary: #000000;
+    --apple-text-secondary: #333333;
+    --apple-bg-primary: #FFFFFF;
+    --apple-bg-secondary: #F5F5F5;
+  }
+  
+  .apple-card {
+    box-shadow: none;
+    border: 1px solid #CCCCCC;
+    break-inside: avoid;
+  }
+  
+  .apple-button-primary,
+  .apple-button-secondary {
+    background: transparent;
+    color: #000000;
+    border: 1px solid #000000;
+  }
+  
+  /* 隐藏不必要的交互元素 */
+  .apple-switch,
+  .filter-panel-reset {
+    display: none;
+  }
+}

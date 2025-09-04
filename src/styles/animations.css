@@ -1,0 +1,622 @@
+/* Apple Style Animations - 苹果风格动画系统 */
+/* 提升用户体验的流畅性和愉悦感 */
+
+/* === 苹果动画基础变量 === */
+:root {
+  /* 动画时长 - Apple Animation Durations */
+  --apple-animation-instant: 0.08s;      /* 即时反馈 */
+  --apple-animation-fast: 0.15s;         /* 快速动画 */
+  --apple-animation-normal: 0.25s;       /* 标准动画 */
+  --apple-animation-slow: 0.35s;         /* 慢速动画 */
+  --apple-animation-deliberate: 0.5s;    /* 深思熟虑的动画 */
+  
+  /* 动画缓动函数 - Apple Easing Functions */
+  --apple-ease-in: cubic-bezier(0.42, 0, 1, 1);
+  --apple-ease-out: cubic-bezier(0, 0, 0.58, 1);
+  --apple-ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+  --apple-ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --apple-ease-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --apple-ease-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
+  --apple-ease-sharp: cubic-bezier(0.4, 0.0, 0.6, 1);
+  --apple-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* 变换值 - Apple Transform Values */
+  --apple-scale-press: 0.96;             /* 按压缩放 */
+  --apple-scale-hover: 1.02;             /* 悬停缩放 */
+  --apple-translate-hover: -2px;         /* 悬停上移 */
+  --apple-translate-press: 0px;          /* 按压位移 */
+  
+  /* 阴影动画值 - Apple Shadow Animation Values */
+  --apple-shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --apple-shadow-press: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* === 基础动画类 === */
+
+/* 淡入动画 - Fade In */
+@keyframes apple-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.apple-fade-in {
+  animation: apple-fade-in var(--apple-animation-normal) var(--apple-ease-out);
+}
+
+/* 淡出动画 - Fade Out */
+@keyframes apple-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.apple-fade-out {
+  animation: apple-fade-out var(--apple-animation-fast) var(--apple-ease-in);
+}
+
+/* 滑入动画 - Slide In */
+@keyframes apple-slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.apple-slide-in-up {
+  animation: apple-slide-in-up var(--apple-animation-normal) var(--apple-ease-out);
+}
+
+@keyframes apple-slide-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.apple-slide-in-down {
+  animation: apple-slide-in-down var(--apple-animation-normal) var(--apple-ease-out);
+}
+
+@keyframes apple-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.apple-slide-in-left {
+  animation: apple-slide-in-left var(--apple-animation-normal) var(--apple-ease-out);
+}
+
+@keyframes apple-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.apple-slide-in-right {
+  animation: apple-slide-in-right var(--apple-animation-normal) var(--apple-ease-out);
+}
+
+/* 缩放动画 - Scale */
+@keyframes apple-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.apple-scale-in {
+  animation: apple-scale-in var(--apple-animation-normal) var(--apple-ease-out);
+}
+
+@keyframes apple-scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+.apple-scale-out {
+  animation: apple-scale-out var(--apple-animation-fast) var(--apple-ease-in);
+}
+
+/* 弹跳动画 - Bounce */
+@keyframes apple-bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.apple-bounce-in {
+  animation: apple-bounce-in var(--apple-animation-deliberate) var(--apple-ease-bounce);
+}
+
+/* 脉冲动画 - Pulse */
+@keyframes apple-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.apple-pulse {
+  animation: apple-pulse 2s var(--apple-ease-in-out) infinite;
+}
+
+/* 摇摆动画 - Shake */
+@keyframes apple-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-3px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(3px);
+  }
+}
+
+.apple-shake {
+  animation: apple-shake var(--apple-animation-deliberate) var(--apple-ease-standard);
+}
+
+/* === 交互动画类 === */
+
+/* 悬停效果 - Hover Effects */
+.apple-hover-lift {
+  transition: all var(--apple-animation-fast) var(--apple-ease-out);
+}
+
+.apple-hover-lift:hover {
+  transform: translateY(var(--apple-translate-hover));
+  box-shadow: var(--apple-shadow-hover);
+}
+
+.apple-hover-scale {
+  transition: transform var(--apple-animation-fast) var(--apple-ease-out);
+}
+
+.apple-hover-scale:hover {
+  transform: scale(var(--apple-scale-hover));
+}
+
+.apple-hover-glow {
+  transition: box-shadow var(--apple-animation-fast) var(--apple-ease-out);
+}
+
+.apple-hover-glow:hover {
+  box-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
+}
+
+/* 按压效果 - Press Effects */
+.apple-press-scale {
+  transition: transform var(--apple-animation-instant) var(--apple-ease-standard);
+}
+
+.apple-press-scale:active {
+  transform: scale(var(--apple-scale-press));
+}
+
+.apple-press-down {
+  transition: all var(--apple-animation-instant) var(--apple-ease-standard);
+}
+
+.apple-press-down:active {
+  transform: translateY(var(--apple-translate-press));
+  box-shadow: var(--apple-shadow-press);
+}
+
+/* 焦点效果 - Focus Effects */
+.apple-focus-ring {
+  transition: box-shadow var(--apple-animation-fast) var(--apple-ease-out);
+}
+
+.apple-focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.3);
+}
+
+/* === 筛选器专用动画 === */
+
+/* 筛选面板展开/收起动画 */
+@keyframes apple-filter-panel-expand {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+.apple-filter-panel-expand {
+  animation: apple-filter-panel-expand var(--apple-animation-normal) var(--apple-ease-out);
+}
+
+@keyframes apple-filter-panel-collapse {
+  from {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.apple-filter-panel-collapse {
+  animation: apple-filter-panel-collapse var(--apple-animation-fast) var(--apple-ease-in);
+}
+
+/* 筛选标签状态变化动画 */
+.apple-filter-tag-transition {
+  transition: all var(--apple-animation-fast) var(--apple-ease-standard);
+}
+
+.apple-filter-tag-transition:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.apple-filter-tag-transition.active {
+  animation: apple-tag-activate var(--apple-animation-normal) var(--apple-ease-bounce);
+}
+
+@keyframes apple-tag-activate {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 分段控制器切换动画 */
+.apple-segment-transition {
+  transition: all var(--apple-animation-normal) var(--apple-ease-standard);
+}
+
+.apple-segment-transition.active {
+  animation: apple-segment-activate var(--apple-animation-normal) var(--apple-ease-out);
+}
+
+@keyframes apple-segment-activate {
+  from {
+    background-color: transparent;
+    box-shadow: none;
+  }
+  to {
+    background-color: var(--apple-bg-primary);
+    box-shadow: var(--apple-shadow-1);
+  }
+}
+
+/* 开关切换动画 */
+.apple-switch-transition {
+  transition: all var(--apple-animation-normal) var(--apple-ease-standard);
+}
+
+.apple-switch-slider {
+  transition: background-color var(--apple-animation-normal) var(--apple-ease-standard);
+}
+
+.apple-switch-slider:before {
+  transition: transform var(--apple-animation-normal) var(--apple-ease-standard);
+}
+
+/* 时间选择器状态变化动画 */
+.apple-time-option-transition {
+  transition: all var(--apple-animation-fast) var(--apple-ease-standard);
+}
+
+.apple-time-option-transition:hover {
+  transform: translateX(2px);
+}
+
+.apple-time-option-transition.active {
+  animation: apple-time-option-select var(--apple-animation-normal) var(--apple-ease-out);
+}
+
+@keyframes apple-time-option-select {
+  0% {
+    background-color: var(--apple-bg-primary);
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  100% {
+    background-color: var(--primary-color);
+    transform: translateX(0);
+  }
+}
+
+/* === 搜索结果动画 === */
+
+/* 搜索结果加载动画 */
+@keyframes apple-results-load {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.apple-results-load {
+  animation: apple-results-load var(--apple-animation-normal) var(--apple-ease-out);
+}
+
+/* 搜索结果项动画 */
+.apple-result-item {
+  transition: all var(--apple-animation-fast) var(--apple-ease-out);
+}
+
+.apple-result-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--apple-shadow-hover);
+}
+
+/* 分页动画 */
+.apple-pagination-transition {
+  transition: all var(--apple-animation-fast) var(--apple-ease-standard);
+}
+
+.apple-pagination-transition:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* === 加载动画 === */
+
+/* 苹果风格加载旋转器 */
+@keyframes apple-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.apple-spinner {
+  animation: apple-spinner 1s linear infinite;
+}
+
+/* 苹果风格脉冲加载 */
+@keyframes apple-pulse-loading {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.apple-pulse-loading {
+  animation: apple-pulse-loading 1.5s var(--apple-ease-in-out) infinite;
+}
+
+/* 苹果风格骨架屏动画 */
+@keyframes apple-skeleton {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.apple-skeleton {
+  background: linear-gradient(90deg, 
+    var(--apple-gray-6) 25%, 
+    var(--apple-gray-5) 37%, 
+    var(--apple-gray-6) 63%);
+  background-size: 400px 100%;
+  animation: apple-skeleton 1.5s ease-in-out infinite;
+}
+
+/* === 通知动画 === */
+
+/* 成功通知动画 */
+@keyframes apple-success-bounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(20px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translateY(-5px);
+  }
+  70% {
+    transform: scale(0.9) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.apple-success-bounce {
+  animation: apple-success-bounce var(--apple-animation-deliberate) var(--apple-ease-bounce);
+}
+
+/* 错误摇摆动画 */
+@keyframes apple-error-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+.apple-error-shake {
+  animation: apple-error-shake var(--apple-animation-deliberate) var(--apple-ease-standard);
+}
+
+/* === 延迟动画类 === */
+
+.apple-delay-1 { animation-delay: 0.1s; }
+.apple-delay-2 { animation-delay: 0.2s; }
+.apple-delay-3 { animation-delay: 0.3s; }
+.apple-delay-4 { animation-delay: 0.4s; }
+.apple-delay-5 { animation-delay: 0.5s; }
+
+/* === 动画持续时间工具类 === */
+
+.apple-duration-instant { animation-duration: var(--apple-animation-instant); }
+.apple-duration-fast { animation-duration: var(--apple-animation-fast); }
+.apple-duration-normal { animation-duration: var(--apple-animation-normal); }
+.apple-duration-slow { animation-duration: var(--apple-animation-slow); }
+.apple-duration-deliberate { animation-duration: var(--apple-animation-deliberate); }
+
+/* === 响应式动画优化 === */
+
+/* 移动设备动画优化 */
+@media (max-width: 768px) {
+  :root {
+    /* 移动设备上稍微加快动画速度 */
+    --apple-animation-fast: 0.12s;
+    --apple-animation-normal: 0.2s;
+    --apple-animation-slow: 0.3s;
+  }
+  
+  /* 减少移动设备上的悬停效果 */
+  .apple-hover-lift:hover,
+  .apple-hover-scale:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* 触摸设备优化 */
+@media (pointer: coarse) {
+  /* 增强触摸反馈 */
+  .apple-press-scale:active {
+    transform: scale(0.94);
+  }
+  
+  .apple-press-down:active {
+    transform: translateY(1px);
+  }
+}
+
+/* 减少动画偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* 保留重要的状态指示器 */
+  .apple-focus-ring:focus-visible {
+    transition: box-shadow 0.15s ease;
+  }
+  
+  .apple-switch-slider,
+  .apple-switch-slider:before {
+    transition: all 0.15s ease;
+  }
+}
+
+/* 高对比度模式动画调整 */
+@media (prefers-contrast: high) {
+  .apple-hover-glow:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+  
+  .apple-focus-ring:focus-visible {
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* === 性能优化 === */
+
+/* 启用硬件加速的元素 */
+.apple-hardware-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* 优化重绘的元素 */
+.apple-optimized-repaint {
+  will-change: transform, opacity;
+}
+
+/* 动画完成后清理 */
+.apple-animation-complete {
+  will-change: auto;
+}

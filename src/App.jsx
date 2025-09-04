@@ -2,13 +2,17 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import './index.css';
 import AnimatedTitle from './components/AnimatedTitle';
 import SearchBar from './components/SearchBar';
-import ResourceTypeFilter from './components/ResourceTypeFilter';
+// 旧的内部筛选组件已移除
+import HomeFilters from './components/HomeFilters';
+// import FilterBar from './components/FilterBar';
 import ResultList from './components/ResultList';
+// import EnhancedResourceCard from './components/EnhancedResourceCard';
 import Pagination from './components/Pagination';
 import FeedbackModal from './components/FeedbackModal';
 import Message from './components/Message';
 import FooterStats from './components/FooterStats';
 import Loading from './components/Loading';
+import useFilters from './hooks/useFilters';
 
 const PAN_TYPE_MAP = {
   baidu: 1,
@@ -23,6 +27,7 @@ const PAN_TYPE_NAME = {
   3: '阿里云盘',
   4: '迅雷网盘'
 };
+
 
 /**
  * 工具函数：复制文本到剪贴板
@@ -61,21 +66,7 @@ async function checkResourceStatus(resourceId, panType) {
   }
 }
 
-/**
- * 获取分享链接（百度/夸克）
- * @param {string} platform
- * @param {string} resourceId
- * @returns {Promise<{share_url?: string, message?: string}>}
- */
-async function getShareLink(platform, resourceId) {
-  try {
-    const res = await fetch(`https://pansoo.cn/api/get_share?platform=${platform}&resource_id=${resourceId}`, { method: 'POST' });
-    return await res.json();
-  } catch (err) {
-    console.error('获取分享链接失败:', err);
-    return { share_url: '', message: '获取分享链接失败' };
-  }
-}
+
 
 function App() {
   const [keyword, setKeyword] = useState('');
@@ -86,8 +77,27 @@ function App() {
   const [totalPages, setTotalPages] = useState(1);
   const [resourceType, setResourceType] = useState('quark'); // 默认夸克网盘
   const [totalCount, setTotalCount] = useState(0);
-  const [searchMode, setSearchMode] = useState('online'); // 'local' or 'online'
+  const [searchMode] = useState('online'); // 固定使用联网模式
   const pageSize = 30; // 统一为30
+
+  // 使用筛选器Hook - 按照API接口规范
+  const {
+    filters,
+    cloudDiskType,
+    fileType,
+    exactMatch,
+    timeRange,
+    updateFilter,
+    resetFilters,
+    hasActiveFilters,
+    buildApiParams,
+    buildResourceServiceParams
+  } = useFilters({
+    cloudDiskType: 'all',
+    fileType: 'all',
+    exactMatch: false,
+    timeRange: 'all'
+  });
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackResource, setFeedbackResource] = useState(null);
   const [feedbackStatus, setFeedbackStatus] = useState('idle'); // idle, success, error
@@ -99,7 +109,7 @@ function App() {
     contact_info: ''
   });
   const [view, setView] = useState('home'); // 'home' or 'search'
-  const [searchParams, setSearchParams] = useState({ keyword: '', searchType: 'local' });
+  const [searchParams, setSearchParams] = useState({ keyword: '', searchType: 'online' });
   const [footerStats, setFooterStats] = useState({ total: 0, yesterday: 0 });
   const [globalActionLoading, setGlobalActionLoading] = useState(false);
   const [feedbackDoneIds, setFeedbackDoneIds] = useState(() => new Set());
@@ -139,6 +149,8 @@ function App() {
       .catch(() => {})
   }, []);
 
+  // 监听过滤器变化，自动重新搜索 - 移到search函数定义后
+
   // 搜索函数（useCallback防止重复创建）
   const search = useCallback(async (customPage, customType, customMode, customKeyword) => {
     const realKeyword = (typeof customKeyword === 'string') ? customKeyword : keyword;
@@ -150,8 +162,17 @@ function App() {
       const panType = PAN_TYPE_MAP[customType || resourceType];
       const currentPage = customPage || page;
       const mode = customMode || searchMode;
+
+      // 构建搜索参数 - 使用标准化的API参数构建函数
+      const searchParams = buildApiParams({
+        query: realKeyword,
+        page: currentPage,
+        pageSize: pageSize,
+        resourceType: customType || resourceType
+      });
+
       if (mode === 'local') {
-        const url = `https://pansoo.cn/api/cached_resources?title=${encodeURIComponent(realKeyword)}&pan_type=${panType}&limit=${pageSize}&page=${currentPage}`;
+        const url = `https://pansoo.cn/api/cached_resources?${searchParams.toString()}`;
         const res = await fetch(url);
         const data = await res.json();
         response = {
@@ -161,14 +182,18 @@ function App() {
         };
       } else {
         if (typeof window !== 'undefined' && window.resourceService) {
+          // 为resourceService构建标准化的筛选参数
+          const filterParams = buildResourceServiceParams(customType || resourceType);
+
           response = await window.resourceService.searchResources(
             realKeyword,
             customType || resourceType,
             currentPage,
-            pageSize
+            pageSize,
+            filterParams
           );
         } else {
-          const url = `https://pansoo.cn/api/search?keyword=${encodeURIComponent(realKeyword)}&pan_type=${panType}&page=${currentPage}&limit=${pageSize}`;
+          const url = `https://pansoo.cn/api/search?${searchParams.toString()}`;
           const res = await fetch(url);
           response = await res.json();
         }
@@ -191,7 +216,17 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [keyword, page, resourceType, searchMode]);
+  }, [keyword, page, resourceType, searchMode, buildApiParams, buildResourceServiceParams]);
+
+  // 仅在筛选条件变化时触发自动搜索，避免首次搜索被重复调用
+  const searchedRef = useRef(searched);
+  useEffect(() => { searchedRef.current = searched; }, [searched]);
+  useEffect(() => {
+    if (!searchedRef.current || !keyword.trim()) return;
+    setPage(1);
+    const t = setTimeout(() => search(1), 100);
+    return () => clearTimeout(t);
+  }, [filters, keyword, search]);
 
   // 资源卡片数据映射（useMemo缓存）
   const mappedResults = useMemo(() => results.map(item => {
@@ -217,28 +252,15 @@ function App() {
         showUserMessage(checkData.message || '资源不可用');
         return;
       }
-      if (panType === 3 || panType === 4) {
-        if (checkData.share_url) {
-          if (window.utools && window.utools.shellOpenExternal) {
-            window.utools.shellOpenExternal(checkData.share_url);
-          } else {
-            window.open(checkData.share_url, '_blank');
-          }
+      // 直接使用 checkResourceStatus 返回的 share_url
+      if (checkData.share_url) {
+        if (window.utools && window.utools.shellOpenExternal) {
+          window.utools.shellOpenExternal(checkData.share_url);
         } else {
-          showUserMessage('未获取到分享链接');
+          window.open(checkData.share_url, '_blank');
         }
-        return;
-      }
-      const platform = panType === 1 ? 'baidu' : 'quark';
-      const shareData = await getShareLink(platform, resourceId);
-      if (!shareData.share_url) {
-        showUserMessage(shareData.message || '资源不可用');
-        return;
-      }
-      if (window.utools && window.utools.shellOpenExternal) {
-        window.utools.shellOpenExternal(shareData.share_url);
       } else {
-        window.open(shareData.share_url, '_blank');
+        showUserMessage('未获取到分享链接');
       }
     } catch (err) {
       console.error('打开链接失败:', err);
@@ -260,25 +282,12 @@ function App() {
         showUserMessage(checkData.message || '资源不可用');
         return;
       }
-      if (panType === 3 || panType === 4) {
-        if (checkData.share_url) {
-          let text = checkData.share_url;
-          if (item.share_pwd) text += ` 提取码：${item.share_pwd}`;
-          copyToClipboard(text);
-        } else {
-          showUserMessage('未获取到分享链接');
-        }
-        return;
+      // 直接使用 checkResourceStatus 返回的 share_url
+      if (checkData.share_url) {
+        copyToClipboard(checkData.share_url);
+      } else {
+        showUserMessage('未获取到分享链接');
       }
-      const platform = panType === 1 ? 'baidu' : 'quark';
-      const shareData = await getShareLink(platform, resourceId);
-      if (!shareData.share_url) {
-        showUserMessage(shareData.message || '资源不可用');
-        return;
-      }
-      let text = shareData.share_url;
-      if (item.share_pwd) text += ` 提取码：${item.share_pwd}`;
-      copyToClipboard(text);
     } catch (err) {
       console.error('复制链接失败:', err);
       showUserMessage('校验或获取链接失败');
@@ -287,31 +296,14 @@ function App() {
     }
   }, [globalActionLoading]);
 
-  // 切换资源类型
-  const handleTypeChange = (type) => {
-    setResourceType(type);
-    setPage(1);
-    // 立即发起新请求，limit=30，pan_type严格对应
-    if (keyword.trim()) {
-      search(1, type);
-    }
-  };
 
-  // 切换本地/联网搜索
-  const handleModeChange = (mode) => {
-    setSearchMode(mode);
-    setPage(1);
-    // 修复：切换模式时立即发起新请求
-    if (keyword.trim()) {
-      setTimeout(() => search(1), 0);
-    }
-  };
 
-  // 切换页码
-  const handlePageChange = (newPage) => {
+  // 切换页码 - 修复状态同步问题，与筛选功能集成
+  const handlePageChange = useCallback((newPage) => {
     setPage(newPage);
-    search(newPage);
-  };
+    // 使用当前筛选状态进行搜索，不再依赖resourceType参数
+    search(newPage, undefined, searchMode, keyword);
+  }, [searchMode, keyword, search]);
 
   // 分页切换后自动滚动到顶部，确保渲染完成后再滚动
   useEffect(() => {
@@ -346,6 +338,7 @@ function App() {
     }
     pages.push(
       <button
+        type="button"
         key="prev"
         onClick={() => handlePageChange(page - 1)}
         disabled={page === 1 || isLoading}
@@ -357,6 +350,7 @@ function App() {
     if (startPage > 1) {
       pages.push(
         <button
+          type="button"
           key="1"
           onClick={() => handlePageChange(1)}
           className="pagination-btn"
@@ -372,6 +366,7 @@ function App() {
     for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <button
+          type="button"
           key={i}
           onClick={() => handlePageChange(i)}
           className={`pagination-btn ${i === page ? 'pagination-active' : ''}`}
@@ -387,6 +382,7 @@ function App() {
       }
       pages.push(
         <button
+          type="button"
           key={totalPages}
           onClick={() => handlePageChange(totalPages)}
           className="pagination-btn"
@@ -398,6 +394,7 @@ function App() {
     }
     pages.push(
       <button
+        type="button"
         key="next"
         onClick={() => handlePageChange(page + 1)}
         disabled={page === totalPages || isLoading}
@@ -469,32 +466,24 @@ function App() {
   };
 
   // 首页搜索后切换到资源卡片页
-  const handleHomeSearch = (newKeyword, newSearchType) => {
+  const handleHomeSearch = (newKeyword) => {
     setKeyword(newKeyword);
-    setSearchMode(newSearchType);
     setPage(1);
     setSearched(false);
     setView('search');
-    setTimeout(() => search(1, undefined, newSearchType, newKeyword), 0);
+    // 使用新的筛选功能进行搜索
+    setTimeout(() => search(1, undefined, searchMode, newKeyword), 0);
   };
 
-  // 资源卡片页切换搜索模式
-  const handleSearchTypeChange = (mode) => {
-    setSearchMode(mode);
-    setPage(1);
-    if (keyword.trim()) {
-      setTimeout(() => search(1, undefined, mode), 0);
-    }
-  };
 
   // 监听 view 和 searchParams，进入搜索页时自动发起请求
   useEffect(() => {
     if (view === 'search' && searchParams.keyword) {
       setKeyword(searchParams.keyword);
-      setSearchMode(searchParams.searchType);
       setPage(1);
       setSearched(false);
-      setTimeout(() => search(1, undefined, searchParams.searchType, searchParams.keyword), 0);
+      // 使用新的筛选功能进行搜索
+      setTimeout(() => search(1, undefined, 'online', searchParams.keyword), 0);
     }
     // eslint-disable-next-line
   }, [view, searchParams]);
@@ -520,7 +509,7 @@ function App() {
       <div style={{display:'none'}}>App Loaded</div>
       {/* 顶部LOGO栏 */}
       <div className="header-bar" style={{cursor:'pointer'}} onClick={handleBackHome}>
-        <span className="logo-text">97 <span className="logo-gradient">PAN SO</span></span>
+        <span className="logo-text">97盘搜</span>
       </div>
       {/* 全局右上角美化消息提示浮层，始终渲染在最外层，zIndex极高 */}
       {showMsg && (
@@ -569,7 +558,7 @@ function App() {
       {view === 'home' && (
         <div className="main-home">
           <div className="main-title-wrap">
-            <AnimatedTitle text="PAN SO" className="main-title-ani" />
+            <AnimatedTitle text="97盘搜" className="main-title-ani" />
             <div className="main-subtitle">探索、发现、分享各类网盘资源</div>
           </div>
           <div className="main-searchbar-outer">
@@ -577,8 +566,14 @@ function App() {
               query={keyword}
               onQueryChange={setKeyword}
               onSearch={handleHomeSearch}
-              searchType={searchMode}
-              onSearchTypeChange={handleSearchTypeChange}
+            />
+            <HomeFilters
+              cloudDiskType={cloudDiskType}
+              fileType={fileType}
+              timeRange={timeRange}
+              exactMatch={exactMatch}
+              onChange={updateFilter}
+              onReset={resetFilters}
             />
           </div>
         </div>
@@ -590,42 +585,33 @@ function App() {
               query={keyword}
               onQueryChange={setKeyword}
               onSearch={handleHomeSearch}
-              searchType={searchMode}
-              onSearchTypeChange={handleSearchTypeChange}
+            />
+            <HomeFilters
+              cloudDiskType={cloudDiskType}
+              fileType={fileType}
+              timeRange={timeRange}
+              exactMatch={exactMatch}
+              onChange={updateFilter}
+              onReset={resetFilters}
             />
           </div>
-          {/* 资源卡片、筛选、分页等原有内容... */}
-          {/* 资源类型筛选 */}
-          <div className="resource-type-filter-bar">
-            <button
-              className={`type-btn quark ${resourceType === 'quark' ? 'active' : ''}`}
-              onClick={() => handleTypeChange('quark')}
-              disabled={isLoading}
-            >
-              夸克网盘
-            </button>
-            <button
-              className={`type-btn baidu ${resourceType === 'baidu' ? 'active' : ''}`}
-              onClick={() => handleTypeChange('baidu')}
-              disabled={isLoading}
-            >
-              百度网盘
-            </button>
-            <button
-              className={`type-btn aliyun ${resourceType === 'aliyun' ? 'active' : ''}`}
-              onClick={() => handleTypeChange('aliyun')}
-              disabled={isLoading}
-            >
-              阿里云盘
-            </button>
-            <button
-              className={`type-btn thunder ${resourceType === 'thunder' ? 'active' : ''}`}
-              onClick={() => handleTypeChange('thunder')}
-              disabled={isLoading}
-            >
-              迅雷网盘
-            </button>
-          </div>
+          {/* 筛选面板 - 集成新的FilterPanel组件 */}
+          {/* 搜索页不再显示筛选条，筛选已移至首页 */}
+
+          {/* 高级过滤器 */}
+          {/* {searched && (
+            <FilterBar
+              panType={panType}
+              onPanTypeChange={setPanType}
+              fileType={fileType}
+              onFileTypeChange={setFileType}
+              exactMatch={exactMatch}
+              onExactMatchChange={setExactMatch}
+              timeFilter={timeFilter}
+              onTimeFilterChange={setTimeFilter}
+            />
+          )} */}
+
           {/* 搜索结果统计 */}
           {searched && (
             <div className="search-stats">

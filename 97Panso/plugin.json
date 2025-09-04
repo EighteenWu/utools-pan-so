@@ -4,8 +4,11 @@
   "version": "1.0.0",
   "author": "EighteenWu",
   "main": "index.html",
-  "preload": "preload.js",
+  "preload": "preload/services.js",
   "logo": "logo.png",
+  "development": {
+    "main": "http://localhost:5173"
+  },
   "pluginSetting": {
     "height": 932,
     "width": 430,
@@ -16,7 +19,14 @@
     {
       "code": "97panso",
       "explain": "搜索百度网盘、夸克网盘、阿里云盘、迅雷网盘等资源",
-      "cmds": ["97", "网盘", "网盘搜索", "资源搜索", "pan", "盘搜"]
+      "cmds": [
+        "97",
+        "网盘",
+        "网盘搜索",
+        "资源搜索",
+        "pan",
+        "盘搜"
+      ]
     }
   ]
 }

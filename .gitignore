@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Tool-specific directories and files
+.bmad-core/
+.cursor/
+.cursorindexingignore
+.specstory/
+.claude/
+web-bundles/

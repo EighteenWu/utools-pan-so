@@ -1,59 +1,549 @@
+/* 引入苹果设计系统基础样式 */
+@import './styles/apple-design-system.css';
+
+/* 全局重置和基础样式 - 苹果设计系统 */
 :root {
-  --blue: rgb(88, 164, 246);
-  --light: #fff;
+  /* 兼容性颜色变量 - 映射到苹果设计系统 */
+  --blue: var(--apple-blue);
+  --light: var(--apple-bg-primary);
+  
+  /* 全局字体渲染优化 */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 }
 
+/* HTML和Body基础样式 */
 html,
 body {
   margin: 0;
   padding: 0;
+  font-family: var(--apple-font-family);
+  line-height: var(--apple-line-height-normal);
+  color: var(--apple-text-primary);
+  background-color: var(--apple-bg-primary);
+  min-height: 100vh;
 }
 
+/* 全局按钮样式 - 苹果设计系统 */
 button {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  font-weight: var(--apple-font-weight-medium);
   border: none;
-  background: none var(--blue);
-  color: var(--light);
-  line-height: 2.5;
+  background: var(--apple-blue);
+  color: var(--apple-bg-primary);
+  border-radius: var(--apple-radius-medium);
+  padding: var(--apple-spacing-2) var(--apple-spacing-4);
   cursor: pointer;
-  transition: opacity .2s;
+  transition: all var(--apple-duration-fast) var(--apple-ease-standard);
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--apple-button-height-medium);
+  line-height: 1;
+}
+
+button:hover:not(:disabled) {
+  background: #0056CC;
+  transform: translateY(-1px);
+  box-shadow: var(--apple-shadow-2);
+}
+
+button:active:not(:disabled) {
+  background: #004499;
+  transform: translateY(0);
+  box-shadow: var(--apple-shadow-1);
+}
+
+button:focus-visible {
+  box-shadow: var(--apple-shadow-focus-ring);
 }
 
 button:disabled {
-  filter: grayscale(1);
+  background: var(--apple-gray-3);
+  color: var(--apple-gray-1);
   cursor: not-allowed;
-}
-
-button:not(:disabled):active {
+  transform: none;
+  box-shadow: none;
   opacity: 0.6;
 }
 
+/* 文本区域样式 - 苹果设计系统 */
 textarea {
   display: block;
   margin: 0;
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  color: var(--apple-text-primary);
+  background: var(--apple-bg-primary);
+  border: 1px solid var(--apple-gray-4);
+  border-radius: var(--apple-radius-medium);
+  padding: var(--apple-spacing-3);
+  outline: none;
+  resize: vertical;
+  transition: all var(--apple-duration-fast) var(--apple-ease-standard);
+  line-height: var(--apple-line-height-normal);
 }
 
-@media (prefers-color-scheme: light) {
-  body {
-    background-color: #f4f4f4;
+textarea::placeholder {
+  color: var(--apple-text-placeholder);
+  font-weight: var(--apple-font-weight-regular);
+}
+
+textarea:focus {
+  border-color: var(--apple-blue);
+  box-shadow: var(--apple-shadow-focus);
+  background: var(--apple-bg-primary);
+}
+
+textarea:disabled {
+  background: var(--apple-bg-secondary);
+  color: var(--apple-gray-1);
+  cursor: not-allowed;
+}
+
+/* 输入框样式 - 苹果设计系统 */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"] {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  color: var(--apple-text-primary);
+  background: var(--apple-bg-primary);
+  border: 1px solid var(--apple-gray-4);
+  border-radius: var(--apple-radius-large);
+  padding: 0 var(--apple-spacing-4);
+  height: var(--apple-input-height-large);
+  outline: none;
+  transition: all var(--apple-duration-fast) var(--apple-ease-standard);
+  appearance: none;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="search"]::placeholder,
+input[type="url"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="number"]::placeholder {
+  color: var(--apple-text-placeholder);
+  font-weight: var(--apple-font-weight-regular);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="url"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus {
+  border-color: var(--apple-blue);
+  box-shadow: var(--apple-shadow-focus);
+  background: var(--apple-bg-primary);
+}
+
+input[type="text"]:disabled,
+input[type="email"]:disabled,
+input[type="password"]:disabled,
+input[type="search"]:disabled,
+input[type="url"]:disabled,
+input[type="tel"]:disabled,
+input[type="number"]:disabled {
+  background: var(--apple-bg-secondary);
+  color: var(--apple-gray-1);
+  cursor: not-allowed;
+}
+
+/* 选择框样式 - 苹果设计系统 */
+select {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  color: var(--apple-text-primary);
+  background: var(--apple-bg-primary);
+  border: 1px solid var(--apple-gray-4);
+  border-radius: var(--apple-radius-medium);
+  padding: var(--apple-spacing-2) var(--apple-spacing-4);
+  height: var(--apple-input-height-medium);
+  outline: none;
+  cursor: pointer;
+  transition: all var(--apple-duration-fast) var(--apple-ease-standard);
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right var(--apple-spacing-3) center;
+  background-size: 16px;
+  padding-right: var(--apple-spacing-8);
+}
+
+select:focus {
+  border-color: var(--apple-blue);
+  box-shadow: var(--apple-shadow-focus);
+}
+
+select:disabled {
+  background: var(--apple-bg-secondary);
+  color: var(--apple-gray-1);
+  cursor: not-allowed;
+}
+
+/* 复选框和单选框样式 - 苹果设计系统 */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--apple-blue);
+  cursor: pointer;
+}
+
+input[type="checkbox"]:disabled,
+input[type="radio"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* 链接样式 - 苹果设计系统 */
+a {
+  color: var(--apple-blue);
+  text-decoration: none;
+  font-weight: var(--apple-font-weight-medium);
+  transition: color var(--apple-duration-fast) var(--apple-ease-standard);
+}
+
+a:hover {
+  color: #0056CC;
+  text-decoration: underline;
+}
+
+a:active {
+  color: #004499;
+}
+
+/* 标题样式 - 苹果设计系统 */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--apple-font-family);
+  color: var(--apple-text-primary);
+  margin: 0;
+  line-height: var(--apple-line-height-tight);
+  font-weight: var(--apple-font-weight-semibold);
+}
+
+h1 {
+  font-size: var(--apple-font-size-large-title);
+  font-weight: var(--apple-font-weight-bold);
+}
+
+h2 {
+  font-size: var(--apple-font-size-title-1);
+  font-weight: var(--apple-font-weight-bold);
+}
+
+h3 {
+  font-size: var(--apple-font-size-title-2);
+}
+
+h4 {
+  font-size: var(--apple-font-size-title-3);
+}
+
+h5 {
+  font-size: var(--apple-font-size-headline);
+}
+
+h6 {
+  font-size: var(--apple-font-size-body);
+}
+
+/* 段落样式 - 苹果设计系统 */
+p {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  color: var(--apple-text-primary);
+  line-height: var(--apple-line-height-normal);
+  margin: 0;
+}
+
+/* 列表样式 - 苹果设计系统 */
+ul, ol {
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  color: var(--apple-text-primary);
+  line-height: var(--apple-line-height-normal);
+  margin: 0;
+  padding-left: var(--apple-spacing-5);
+}
+
+li {
+  margin-bottom: var(--apple-spacing-1);
+}
+
+/* 代码样式 - 苹果设计系统 */
+code, pre {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: var(--apple-font-size-footnote);
+  background: var(--apple-bg-secondary);
+  color: var(--apple-text-primary);
+  border-radius: var(--apple-radius-small);
+}
+
+code {
+  padding: var(--apple-spacing-1) var(--apple-spacing-2);
+}
+
+pre {
+  padding: var(--apple-spacing-3);
+  overflow-x: auto;
+  border: 1px solid var(--apple-gray-5);
+}
+
+/* 分隔线样式 - 苹果设计系统 */
+hr {
+  border: none;
+  height: 1px;
+  background: var(--apple-gray-5);
+  margin: var(--apple-spacing-4) 0;
+}
+
+/* 表格样式 - 苹果设计系统 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--apple-font-family);
+  font-size: var(--apple-font-size-body);
+  color: var(--apple-text-primary);
+}
+
+th, td {
+  padding: var(--apple-spacing-3);
+  text-align: left;
+  border-bottom: 1px solid var(--apple-gray-5);
+}
+
+th {
+  font-weight: var(--apple-font-weight-semibold);
+  color: var(--apple-text-primary);
+  background: var(--apple-bg-secondary);
+}
+
+/* 滚动条样式 - 苹果设计系统 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--apple-bg-secondary);
+  border-radius: var(--apple-radius-small);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--apple-gray-3);
+  border-radius: var(--apple-radius-small);
+  border: 2px solid var(--apple-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--apple-gray-2);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--apple-bg-secondary);
+}
+
+/* 选择文本样式 - 苹果设计系统 */
+::selection {
+  background: rgba(0, 122, 255, 0.3);
+  color: var(--apple-text-primary);
+}
+
+::-moz-selection {
+  background: rgba(0, 122, 255, 0.3);
+  color: var(--apple-text-primary);
+}
+
+/* 焦点样式 - 苹果设计系统 */
+:focus-visible {
+  outline: 2px solid var(--apple-blue);
+  outline-offset: 2px;
+}
+
+/* 禁用元素样式 - 苹果设计系统 */
+:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 响应式字体大小 */
+@media (max-width: 768px) {
+  :root {
+    font-size: 14px;
   }
-  ::-webkit-scrollbar-track-piece {
-    background-color: #f4f4f4;
+  
+  h1 {
+    font-size: var(--apple-font-size-title-1);
   }
-  ::-webkit-scrollbar-thumb {
-    border-color: #f4f4f4;
+  
+  h2 {
+    font-size: var(--apple-font-size-title-2);
+  }
+  
+  button {
+    min-height: var(--apple-button-height-medium);
+    font-size: var(--apple-font-size-callout);
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="url"],
+  input[type="tel"],
+  input[type="number"] {
+    height: var(--apple-input-height-medium);
+    font-size: var(--apple-font-size-callout);
+  }
+  
+  textarea {
+    font-size: var(--apple-font-size-callout);
+  }
+  
+  select {
+    height: var(--apple-input-height-medium);
+    font-size: var(--apple-font-size-callout);
   }
 }
 
+@media (max-width: 480px) {
+  :root {
+    font-size: 13px;
+  }
+  
+  button {
+    min-height: var(--apple-button-height-small);
+    padding: var(--apple-spacing-2) var(--apple-spacing-3);
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="url"],
+  input[type="tel"],
+  input[type="number"] {
+    height: var(--apple-input-height-small);
+    padding: 0 var(--apple-spacing-3);
+  }
+  
+  select {
+    height: var(--apple-input-height-small);
+    padding: var(--apple-spacing-1) var(--apple-spacing-3);
+  }
+}
+
+/* 深色模式支持 - 苹果设计系统 */
 @media (prefers-color-scheme: dark) {
-  &::-webkit-scrollbar-track-piece {
-    background-color: #303133;
+  :root {
+    --apple-text-primary: #FFFFFF;
+    --apple-text-secondary: #EBEBF5;
+    --apple-text-tertiary: #EBEBF599;
+    --apple-text-quaternary: #EBEBF54D;
+    --apple-text-placeholder: #EBEBF54D;
+    
+    --apple-bg-primary: #000000;
+    --apple-bg-secondary: #1C1C1E;
+    --apple-bg-tertiary: #2C2C2E;
+    --apple-bg-grouped: #1C1C1E;
+    
+    --apple-gray-1: #8E8E93;
+    --apple-gray-2: #636366;
+    --apple-gray-3: #48484A;
+    --apple-gray-4: #3A3A3C;
+    --apple-gray-5: #2C2C2E;
+    --apple-gray-6: #1C1C1E;
   }
-  &::-webkit-scrollbar-thumb {
-    background-color: #666;
-    border-color: #303133;
+  
+  ::-webkit-scrollbar-track {
+    background: var(--apple-bg-tertiary);
   }
-  body {
-    background-color: #303133;
-    color: #fff;
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--apple-gray-3);
+    border-color: var(--apple-bg-tertiary);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--apple-gray-2);
+  }
+  
+  ::-webkit-scrollbar-corner {
+    background: var(--apple-bg-tertiary);
+  }
+  
+  ::selection {
+    background: rgba(10, 132, 255, 0.4);
+  }
+  
+  ::-moz-selection {
+    background: rgba(10, 132, 255, 0.4);
+  }
+}
+
+/* 减少动画偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  :root {
+    --apple-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --apple-shadow-2: 0 2px 6px rgba(0, 0, 0, 0.3);
+    --apple-shadow-3: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --apple-shadow-4: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --apple-shadow-5: 0 16px 48px rgba(0, 0, 0, 0.3);
+  }
+  
+  button,
+  input,
+  textarea,
+  select {
+    border-width: 2px;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  
+  button {
+    display: none;
+  }
+  
+  @page {
+    margin: 0.5in;
   }
 }

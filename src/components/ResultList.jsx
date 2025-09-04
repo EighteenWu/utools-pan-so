@@ -10,13 +10,24 @@ export default function ResultList({
 }) {
   // 全局 loading 状态，所有按钮都禁用
   const allDisabled = isLoading || actionLoading;
+  const panIconSrc = (panType) => {
+    const t = Number(panType);
+    if (t === 1) return '/icons/baidupan.png';
+    if (t === 2) return '/icons/quark.png';
+    if (t === 3) return '/icons/alipan.png';
+    if (t === 4) return '/icons/xunlei.png';
+    return '/icons/quark.png';
+  };
   return (
     <div className="results">
       {results.map((item, index) => (
         <div key={item.resource_id || index} className="result-item card-pansoo">
           <div className="card-title-row">
             <span className="card-title">{item.title}</span>
-            <span className={`card-badge badge-${item.pan_type}`}>{item.pan_type_name}</span>
+            <span className="card-badge card-badge-plain">
+              <img src={panIconSrc(item.pan_type)} alt="" className="badge-icon-img" />
+              {item.pan_type_name}
+            </span>
           </div>
           <div className="card-desc">{item.pan_type_name}缓存资源</div>
           <div className="card-meta">
