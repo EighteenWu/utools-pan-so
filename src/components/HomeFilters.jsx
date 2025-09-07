@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * 首页筛选（下拉版）
- * - 网盘类型、文件类型、时间范围全部使用<select>
+ * - 网盘类型、文件类型、时间范围全部使用 <select>
  */
 export default function HomeFilters({
   cloudDiskType,
@@ -77,3 +77,4 @@ export default function HomeFilters({
     </div>
   );
 }
+

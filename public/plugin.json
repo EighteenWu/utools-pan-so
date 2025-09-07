@@ -4,16 +4,11 @@
   "version": "1.0.7",
   "author": "EighteenWu",
   "main": "index.html",
-  "preload": "preload/services.js",
+  "preload": "preload.js",
   "logo": "logo.png",
   "development": {
-    "main": "http://localhost:5173"
-  },
-  "pluginSetting": {
-    "height": 932,
-    "width": 430,
-    "single": true,
-    "resizable": false
+    "main": "http://localhost:5173",
+    "preload": "preload.js"
   },
   "features": [
     {

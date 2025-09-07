@@ -1,25 +1,10 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import './index.css';
-import AnimatedTitle from './components/AnimatedTitle';
 import SearchBar from './components/SearchBar';
-// 旧的内部筛选组件已移除
 import HomeFilters from './components/HomeFilters';
-// import FilterBar from './components/FilterBar';
 import ResultList from './components/ResultList';
-// import EnhancedResourceCard from './components/EnhancedResourceCard';
-import Pagination from './components/Pagination';
-import FeedbackModal from './components/FeedbackModal';
 import Message from './components/Message';
-import FooterStats from './components/FooterStats';
-import Loading from './components/Loading';
-import useFilters from './hooks/useFilters';
-
-const PAN_TYPE_MAP = {
-  baidu: 1,
-  quark: 2,
-  aliyun: 3,
-  thunder: 4
-};
+import { useFilters } from './hooks/useFilters';
 
 const PAN_TYPE_NAME = {
   1: '百度网盘',
@@ -28,59 +13,51 @@ const PAN_TYPE_NAME = {
   4: '迅雷网盘'
 };
 
-
-/**
- * 工具函数：复制文本到剪贴板
- */
 function copyToClipboard(text) {
-  if (window.utools && window.utools.copyText) {
-    window.utools.copyText(text);
-    window.utools.showNotification('链接已复制');
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(text);
-    alert('链接已复制');
-  } else {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    alert('链接已复制');
-  }
+  try {
+    if (window.utools && window.utools.copyText) {
+      window.utools.copyText(text);
+      window.utools.showNotification('链接已复制');
+      return;
+    }
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text);
+      alert('链接已复制');
+      return;
+    }
+  } catch {}
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+  alert('链接已复制');
 }
 
-/**
- * 校验资源有效性
- * @param {string} resourceId
- * @param {number} panType
- * @returns {Promise<{valid: boolean, message: string, share_url?: string}>}
- */
 async function checkResourceStatus(resourceId, panType) {
   try {
     const res = await fetch(`https://pansoo.cn/api/check_resource_status?resource_id=${resourceId}&pan_type=${panType}`);
     return await res.json();
   } catch (err) {
-    console.error('资源有效性校验失败:', err);
+    console.error('资源有效性校验失败', err);
     return { valid: false, message: '校验失败' };
   }
 }
 
-
-
-function App() {
+export default function App() {
   const [keyword, setKeyword] = useState('');
+  const [searchedKeyword, setSearchedKeyword] = useState('');
   const [results, setResults] = useState([]);
   const [searched, setSearched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [resourceType, setResourceType] = useState('quark'); // 默认夸克网盘
+  const [resourceType, setResourceType] = useState('quark');
   const [totalCount, setTotalCount] = useState(0);
-  const [searchMode] = useState('online'); // 固定使用联网模式
-  const pageSize = 30; // 统一为30
+  const [searchMode] = useState('online');
+  const pageSize = 15;
 
-  // 使用筛选器Hook - 按照API接口规范
   const {
     filters,
     cloudDiskType,
@@ -98,106 +75,49 @@ function App() {
     exactMatch: false,
     timeRange: 'all'
   });
+
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackResource, setFeedbackResource] = useState(null);
-  const [feedbackStatus, setFeedbackStatus] = useState('idle'); // idle, success, error
+  const [feedbackStatus, setFeedbackStatus] = useState('idle');
   const [feedbackMsg, setFeedbackMsg] = useState('');
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
-  const [feedbackForm, setFeedbackForm] = useState({
-    invalid_type: 1,
-    description: '',
-    contact_info: ''
-  });
-  const [view, setView] = useState('home'); // 'home' or 'search'
-  const [searchParams, setSearchParams] = useState({ keyword: '', searchType: 'online' });
+  const [feedbackForm, setFeedbackForm] = useState({ invalid_type: 1, description: '', contact_info: '' });
   const [footerStats, setFooterStats] = useState({ total: 0, yesterday: 0 });
   const [globalActionLoading, setGlobalActionLoading] = useState(false);
   const [feedbackDoneIds, setFeedbackDoneIds] = useState(() => new Set());
   const [deletedResourceMsg, setDeletedResourceMsg] = useState('');
-  const [actionLoading, setActionLoading] = useState({ id: null, type: null });
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
-  const isUtools = typeof window !== 'undefined' && window.utools;
-  const isResourceService = typeof window !== 'undefined' && window.resourceService;
-
-  // 全局美化消息提示浮层 hooks 必须在组件体内
   const [message, setMessage] = useState({ text: '', type: 'info' });
   const [showMsg, setShowMsg] = useState(false);
   const msgTimerRef = useRef();
 
-  function showUserMessage(text, type = 'info') {
+  const showUserMessage = (text, type = 'info') => {
     setMessage({ text, type });
     setShowMsg(true);
     if (msgTimerRef.current) clearTimeout(msgTimerRef.current);
     msgTimerRef.current = setTimeout(() => setShowMsg(false), 2600);
-  }
+  };
 
-  // 页脚统计数据
-  useEffect(() => {
-    // 获取本地资源数
-    let localTotal = 0;
-    // 这里无法直接读取本地 json，直接用 0
-    fetch('https://pansoo.cn/api/resource_stats')
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === 'success') {
-          setFooterStats({
-            total: localTotal + data.total,
-            yesterday: data.yesterday
-          });
-        }
-      })
-      .catch(() => {})
-  }, []);
-
-  // 监听过滤器变化，自动重新搜索 - 移到search函数定义后
-
-  // 搜索函数（useCallback防止重复创建）
-  const search = useCallback(async (customPage, customType, customMode, customKeyword) => {
-    const realKeyword = (typeof customKeyword === 'string') ? customKeyword : keyword;
-    if (!realKeyword.trim()) return;
+  const search = useCallback(async (currentPage = 1, customType, mode = searchMode, customKeyword) => {
+    const realKeyword = (customKeyword ?? keyword).trim();
+    if (!realKeyword) return;
     setIsLoading(true);
     setSearched(true);
+    setSearchedKeyword(realKeyword);
     try {
-      let response;
-      const panType = PAN_TYPE_MAP[customType || resourceType];
-      const currentPage = customPage || page;
-      const mode = customMode || searchMode;
-
-      // 构建搜索参数 - 使用标准化的API参数构建函数
-      const searchParams = buildApiParams({
-        query: realKeyword,
+      const params = buildApiParams({
+        keyword: realKeyword,
         page: currentPage,
-        pageSize: pageSize,
+        pageSize,
         resourceType: customType || resourceType
       });
-
-      if (mode === 'local') {
-        const url = `https://pansoo.cn/api/cached_resources?${searchParams.toString()}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        response = {
-          results: data.resources || [],
-          total: data.total || (data.resources ? data.resources.length : 0),
-          status: data.status || 'success',
-        };
-      } else {
-        if (typeof window !== 'undefined' && window.resourceService) {
-          // 为resourceService构建标准化的筛选参数
-          const filterParams = buildResourceServiceParams(customType || resourceType);
-
-          response = await window.resourceService.searchResources(
-            realKeyword,
-            customType || resourceType,
-            currentPage,
-            pageSize,
-            filterParams
-          );
-        } else {
-          const url = `https://pansoo.cn/api/search?${searchParams.toString()}`;
-          const res = await fetch(url);
-          response = await res.json();
-        }
-      }
+      const url = `https://pansoo.cn/api/${mode === 'local' ? 'cached_resources' : 'search'}?${params.toString()}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const response = mode === 'local'
+        ? { results: data.resources || [], total: data.total || (data.resources ? data.resources.length : 0), status: data.status || 'success' }
+        : data;
       if (response.status === 'error' || !response.results) {
         setResults([]);
         setTotalPages(1);
@@ -205,10 +125,10 @@ function App() {
       } else {
         setResults(response.results || []);
         setTotalCount(response.total || 0);
-        setTotalPages(Math.ceil((response.total || 0) / pageSize));
+        setTotalPages(Math.ceil((response.total || 0) / pageSize) || 1);
       }
-    } catch (error) {
-      console.error('搜索失败:', error);
+    } catch (e) {
+      console.error('搜索失败:', e);
       showUserMessage('搜索失败，请稍后重试');
       setResults([]);
       setTotalPages(1);
@@ -216,19 +136,19 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [keyword, page, resourceType, searchMode, buildApiParams, buildResourceServiceParams]);
+  }, [keyword, resourceType, searchMode, pageSize, buildApiParams]);
 
-  // 仅在筛选条件变化时触发自动搜索，避免首次搜索被重复调用
   const searchedRef = useRef(searched);
   useEffect(() => { searchedRef.current = searched; }, [searched]);
-  useEffect(() => {
-    if (!searchedRef.current || !keyword.trim()) return;
-    setPage(1);
-    const t = setTimeout(() => search(1), 100);
-    return () => clearTimeout(t);
-  }, [filters, keyword, search]);
 
-  // 资源卡片数据映射（useMemo缓存）
+  // 筛选器变化时自动触发搜索（只在已经搜索过的情况下）
+  useEffect(() => {
+    if (!searchedRef.current || !searchedKeyword.trim()) return;
+    setPage(1);
+    const t = setTimeout(() => search(1, undefined, undefined, searchedKeyword), 100);
+    return () => clearTimeout(t);
+  }, [filters, search, searchedKeyword]);
+
   const mappedResults = useMemo(() => results.map(item => {
     const panTypeNum = Number(item.pan_type);
     return {
@@ -236,25 +156,21 @@ function App() {
       title: item.file_name || item.title || '',
       pan_type: panTypeNum,
       pan_type_name: PAN_TYPE_NAME[panTypeNum] || '未知网盘',
-      updated_at: item.updated_at || item.created_at || '',
+      updated_at: item.updated_at || item.created_at || ''
     };
   }), [results]);
 
-  // 资源卡片"打开链接"按钮逻辑
   const handleOpenLink = useCallback(async (item) => {
     if (globalActionLoading) return;
     setGlobalActionLoading(true);
     try {
-      const panType = item.pan_type;
-      const resourceId = item.resource_id;
-      const checkData = await checkResourceStatus(resourceId, panType);
+      const checkData = await checkResourceStatus(item.resource_id, item.pan_type);
       if (!checkData.valid) {
         showUserMessage(checkData.message || '资源不可用');
         return;
       }
-      // 直接使用 checkResourceStatus 返回的 share_url
       if (checkData.share_url) {
-        if (window.utools && window.utools.shellOpenExternal) {
+        if (window.utools?.shellOpenExternal) {
           window.utools.shellOpenExternal(checkData.share_url);
         } else {
           window.open(checkData.share_url, '_blank');
@@ -262,159 +178,54 @@ function App() {
       } else {
         showUserMessage('未获取到分享链接');
       }
-    } catch (err) {
-      console.error('打开链接失败:', err);
+    } catch (e) {
+      console.error('打开链接失败:', e);
       showUserMessage('校验或获取链接失败');
     } finally {
       setGlobalActionLoading(false);
     }
   }, [globalActionLoading]);
 
-  // 资源卡片"复制链接"按钮逻辑
   const handleCopyLink = useCallback(async (item) => {
     if (globalActionLoading) return;
     setGlobalActionLoading(true);
     try {
-      const panType = item.pan_type;
-      const resourceId = item.resource_id;
-      const checkData = await checkResourceStatus(resourceId, panType);
+      const checkData = await checkResourceStatus(item.resource_id, item.pan_type);
       if (!checkData.valid) {
         showUserMessage(checkData.message || '资源不可用');
         return;
       }
-      // 直接使用 checkResourceStatus 返回的 share_url
       if (checkData.share_url) {
         copyToClipboard(checkData.share_url);
       } else {
         showUserMessage('未获取到分享链接');
       }
-    } catch (err) {
-      console.error('复制链接失败:', err);
+    } catch (e) {
+      console.error('复制链接失败:', e);
       showUserMessage('校验或获取链接失败');
     } finally {
       setGlobalActionLoading(false);
     }
   }, [globalActionLoading]);
 
-
-
-  // 切换页码 - 修复状态同步问题，与筛选功能集成
   const handlePageChange = useCallback((newPage) => {
     setPage(newPage);
-    // 使用当前筛选状态进行搜索，不再依赖resourceType参数
     search(newPage, undefined, searchMode, keyword);
-  }, [searchMode, keyword, search]);
+  }, [search, searchMode, keyword]);
 
-  // 分页切换后自动滚动到顶部，确保渲染完成后再滚动
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [page]);
 
-  // 处理搜索表单提交
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleHomeSearch = useCallback((newKeyword) => {
+    const searchKeyword = newKeyword || keyword;
+    if (!searchKeyword.trim()) return;
+    setKeyword(searchKeyword);
     setPage(1);
-    search(1);
-  };
+    setSearched(false);
+    setTimeout(() => search(1, undefined, searchMode, searchKeyword), 0);
+  }, [keyword, search, searchMode]);
 
-  // 卡片时间格式化
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
-    return d.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  };
-
-  // 渲染分页控件
-  const renderPagination = () => {
-    if (totalPages <= 1) return null;
-    const pages = [];
-    const maxDisplayedPages = 5;
-    const halfMaxPages = Math.floor(maxDisplayedPages / 2);
-    let startPage = Math.max(1, page - halfMaxPages);
-    const endPage = Math.min(totalPages, startPage + maxDisplayedPages - 1);
-    if (endPage - startPage + 1 < maxDisplayedPages) {
-      startPage = Math.max(1, endPage - maxDisplayedPages + 1);
-    }
-    pages.push(
-      <button
-        type="button"
-        key="prev"
-        onClick={() => handlePageChange(page - 1)}
-        disabled={page === 1 || isLoading}
-        className="pagination-btn"
-      >
-        上一页
-      </button>
-    );
-    if (startPage > 1) {
-      pages.push(
-        <button
-          type="button"
-          key="1"
-          onClick={() => handlePageChange(1)}
-          className="pagination-btn"
-          disabled={isLoading}
-        >
-          1
-        </button>
-      );
-      if (startPage > 2) {
-        pages.push(<span key="dots1" className="pagination-dots">...</span>);
-      }
-    }
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <button
-          type="button"
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`pagination-btn ${i === page ? 'pagination-active' : ''}`}
-          disabled={isLoading}
-        >
-          {i}
-        </button>
-      );
-    }
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) {
-        pages.push(<span key="dots2" className="pagination-dots">...</span>);
-      }
-      pages.push(
-        <button
-          type="button"
-          key={totalPages}
-          onClick={() => handlePageChange(totalPages)}
-          className="pagination-btn"
-          disabled={isLoading}
-        >
-          {totalPages}
-        </button>
-      );
-    }
-    pages.push(
-      <button
-        type="button"
-        key="next"
-        onClick={() => handlePageChange(page + 1)}
-        disabled={page === totalPages || isLoading}
-        className="pagination-btn"
-      >
-        下一页
-      </button>
-    );
-    return <div className="pagination">{pages}</div>;
-  };
-
-  // 打开反馈弹窗
-  const openFeedback = (item) => {
-    setFeedbackResource(item);
-    setFeedbackForm({ invalid_type: 1, description: '', contact_info: '' });
-    setFeedbackStatus('idle');
-    setFeedbackMsg('');
-    setFeedbackOpen(true);
-  };
-  // 关闭反馈弹窗并重置
   const closeFeedback = () => {
     setFeedbackOpen(false);
     setFeedbackResource(null);
@@ -422,7 +233,7 @@ function App() {
     setFeedbackStatus('idle');
     setFeedbackMsg('');
   };
-  // 提交反馈
+
   const submitFeedback = async (e) => {
     e.preventDefault();
     if (!feedbackResource) return;
@@ -442,22 +253,20 @@ function App() {
       const data = await res.json();
       if (res.ok && data.status !== 'error') {
         if (data.is_deleted) {
-          // 资源已自动删除，移除卡片并提示
           setResults(prev => prev.filter(r => r.resource_id !== feedbackResource.resource_id));
           setDeletedResourceMsg('该资源已确认失效并自动删除');
           setTimeout(() => setDeletedResourceMsg(''), 3000);
         } else {
-          // 反馈成功，按钮变为已反馈
           setFeedbackDoneIds(prev => new Set(prev).add(feedbackResource.resource_id));
           setFeedbackStatus('success');
-          setFeedbackMsg('该资源仍然有效,感谢你的反馈。');
+          setFeedbackMsg('该资源仍然有效，感谢你的反馈');
         }
         setTimeout(() => closeFeedback(), 1200);
       } else {
         setFeedbackStatus('error');
         setFeedbackMsg(data.message || '提交失败，请稍后重试');
       }
-    } catch (err) {
+    } catch (e) {
       setFeedbackStatus('error');
       setFeedbackMsg('提交失败，请稍后重试');
     } finally {
@@ -465,235 +274,148 @@ function App() {
     }
   };
 
-  // 首页搜索后切换到资源卡片页
-  const handleHomeSearch = (newKeyword) => {
-    setKeyword(newKeyword);
-    setPage(1);
-    setSearched(false);
-    setView('search');
-    // 使用新的筛选功能进行搜索
-    setTimeout(() => search(1, undefined, searchMode, newKeyword), 0);
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-
-  // 监听 view 和 searchParams，进入搜索页时自动发起请求
-  useEffect(() => {
-    if (view === 'search' && searchParams.keyword) {
-      setKeyword(searchParams.keyword);
-      setPage(1);
-      setSearched(false);
-      // 使用新的筛选功能进行搜索
-      setTimeout(() => search(1, undefined, 'online', searchParams.keyword), 0);
-    }
-    // eslint-disable-next-line
-  }, [view, searchParams]);
-
-  // 结果页返回首页
-  const handleBackHome = () => {
-    setView('home');
-    setKeyword('');
-    setResults([]);
-    setSearched(false);
-    setPage(1);
-  };
-
-  // 修复：如果view为search但keyword为空，自动跳回首页，防止页面空白
-  useEffect(() => {
-    if (view === 'search' && !keyword.trim()) {
-      setView('home');
-    }
-  }, [view, keyword]);
 
   return (
     <div className="container">
-      <div style={{display:'none'}}>App Loaded</div>
-      {/* 顶部LOGO栏 */}
-      <div className="header-bar" style={{cursor:'pointer'}} onClick={handleBackHome}>
-        <span className="logo-text">97盘搜</span>
-      </div>
-      {/* 全局右上角美化消息提示浮层，始终渲染在最外层，zIndex极高 */}
-      {showMsg && (
-        <div style={{
-          position: 'fixed',
-          top: 18,
-          right: 24,
-          zIndex: 999999,
-          minWidth: 220,
-          background: message.type === 'success' ? '#f6ffed' : message.type === 'error' ? '#fff2f0' : message.type === 'warning' ? '#fffbe6' : '#e6f4ff',
-          color: message.type === 'success' ? '#52c41a' : message.type === 'error' ? '#f5222d' : message.type === 'warning' ? '#faad14' : '#1677ff',
-          border: `1.5px solid ${message.type === 'success' ? '#b7eb8f' : message.type === 'error' ? '#ffccc7' : message.type === 'warning' ? '#ffe58f' : '#91d5ff'}`,
-          borderRadius: 8,
-          boxShadow: '0 2px 12px rgba(0,0,0,0.13)',
-          padding: '12px 22px 12px 18px',
-          fontWeight: 500,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          transition: 'opacity 0.25s',
-          opacity: showMsg ? 1 : 0
-        }}>
-          <span style={{fontSize:20,display:'inline-flex',alignItems:'center'}}>
-            {message.type === 'success' && (
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#52c41a" strokeWidth="2" fill="#f6ffed"/><path d="M6.5 10.5l2 2 5-5" stroke="#52c41a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            )}
-            {message.type === 'error' && (
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#f5222d" strokeWidth="2" fill="#fff2f0"/><path d="M10 6v5" stroke="#f5222d" strokeWidth="2" strokeLinecap="round"/><circle cx="10" cy="14" r="1" fill="#f5222d"/></svg>
-            )}
-            {message.type === 'warning' && (
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#faad14" strokeWidth="2" fill="#fffbe6"/><path d="M10 6v5" stroke="#faad14" strokeWidth="2" strokeLinecap="round"/><circle cx="10" cy="14" r="1" fill="#faad14"/></svg>
-            )}
-            {message.type === 'info' && (
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#1677ff" strokeWidth="2" fill="#e6f4ff"/><path d="M10 7v5" stroke="#1677ff" strokeWidth="2" strokeLinecap="round"/><circle cx="10" cy="14" r="1" fill="#1677ff"/></svg>
-            )}
-          </span>
-          <span style={{fontSize:15,lineHeight:1.6}}>{message.text}</span>
+      {/* Header */}
+      <div className="top-header-row">
+        <div className="header-title" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <span className="logo-text">97盘搜</span>
         </div>
-      )}
+        <div className="search-section">
+          <SearchBar
+            query={keyword}
+            onQueryChange={setKeyword}
+            onSearch={handleHomeSearch}
+          />
+        </div>
+        <div className="filters-section">
+          <HomeFilters
+            cloudDiskType={cloudDiskType}
+            fileType={fileType}
+            timeRange={timeRange}
+            exactMatch={exactMatch}
+            onChange={updateFilter}
+            onReset={resetFilters}
+          />
+        </div>
+      </div>
+
+      {/* 提示消息 */}
+      <Message show={showMsg} message={message} />
+
       {/* 右上角全局 loading-spinner，仅动画提示，不遮盖主内容 */}
       {globalActionLoading && (
         <div style={{position:'fixed',top:18,right:64,zIndex:9999}}>
           <span className="loading-spinner" style={{width:28,height:28,borderWidth:3,display:'inline-block'}}></span>
         </div>
       )}
-      {view === 'home' && (
-        <div className="main-home">
-          <div className="main-title-wrap">
-            <AnimatedTitle text="97盘搜" className="main-title-ani" />
-            <div className="main-subtitle">探索、发现、分享各类网盘资源</div>
-          </div>
-          <div className="main-searchbar-outer">
-            <SearchBar
-              query={keyword}
-              onQueryChange={setKeyword}
-              onSearch={handleHomeSearch}
-            />
-            <HomeFilters
-              cloudDiskType={cloudDiskType}
-              fileType={fileType}
-              timeRange={timeRange}
-              exactMatch={exactMatch}
-              onChange={updateFilter}
-              onReset={resetFilters}
-            />
+
+      {/* 搜索结果统计 */}
+      {searched && (
+        <div className="search-stats">
+          搜索 <span className="highlight">{searchedKeyword}</span> 的结果，共 <span className="highlight">{totalCount}</span> 条
+        </div>
+      )}
+
+      {/* 搜索结果列表 */}
+      {mappedResults.length > 0 && (
+        <div className="results">
+          <ResultList
+            results={mappedResults}
+            onOpenLink={handleOpenLink}
+            onCopyLink={handleCopyLink}
+            onFeedback={(item) => { setFeedbackResource(item); setFeedbackOpen(true); }}
+            isLoading={isLoading || globalActionLoading}
+            actionLoading={isLoading || globalActionLoading}
+            feedbackDoneIds={feedbackDoneIds}
+            formatDate={(s) => {
+              if (!s) return '';
+              const d = new Date(s);
+              if (Number.isNaN(d.getTime())) return s;
+              return d.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }}
+          />
+        </div>
+      )}
+
+      {/* 无结果提示 */}
+      {searched && mappedResults.length === 0 && !isLoading && (
+        <div className="no-results">未找到相关资源</div>
+      )}
+
+      {/* 加载中 */}
+      {isLoading && (
+        <div className="loading">
+          <div className="loading-spinner"></div>
+          <div>搜索中，请稍候...</div>
+        </div>
+      )}
+
+      {/* 分页控件（简易） */}
+      {mappedResults.length > 0 && totalPages > 1 && (
+        <div className="pagination">
+          <button type="button" className="pagination-btn" disabled={page === 1 || isLoading} onClick={() => handlePageChange(page - 1)}>上一页</button>
+          {Array.from({ length: totalPages }).slice(Math.max(0, page - 3), Math.min(totalPages, page + 2)).map((_, idx) => {
+            const p = Math.max(1, page - 2) + idx;
+            if (p > totalPages) return null;
+            return (
+              <button key={p} type="button" className={`pagination-btn ${p === page ? 'pagination-active' : ''}`} disabled={isLoading} onClick={() => handlePageChange(p)}>{p}</button>
+            );
+          })}
+          <button type="button" className="pagination-btn" disabled={page === totalPages || isLoading} onClick={() => handlePageChange(page + 1)}>下一页</button>
+        </div>
+      )}
+
+      {/* 资源失效反馈弹窗 */}
+      {feedbackOpen && feedbackResource && (
+        <div className="feedback-modal-bg">
+          <div className="feedback-modal">
+            <div className="feedback-modal-header">
+              <span>资源失效反馈</span>
+              <button className="feedback-modal-close" onClick={closeFeedback}>×</button>
+            </div>
+            <form className="feedback-form" onSubmit={submitFeedback}>
+              <div className="feedback-form-group">
+                <label>失效类型 <span style={{color:'red'}}>*</span></label>
+                <select value={feedbackForm.invalid_type} onChange={e=>setFeedbackForm(f=>({...f,invalid_type:Number(e.target.value)}))} required>
+                  <option value={1}>链接错误</option>
+                  <option value={2}>资源失效</option>
+                  <option value={3}>文件不存在</option>
+                </select>
+              </div>
+              <div className="feedback-form-group">
+                <label>补充说明</label>
+                <textarea value={feedbackForm.description} onChange={e=>setFeedbackForm(f=>({...f,description:e.target.value}))} placeholder="请详细描述资源失效的具体情况..." rows={3} />
+              </div>
+              <div className="feedback-form-group">
+                <label>联系方式</label>
+                <input type="text" value={feedbackForm.contact_info} onChange={e=>setFeedbackForm(f=>({...f,contact_info:e.target.value}))} placeholder="您的邮箱或其他联系方式（选填）" />
+              </div>
+              {feedbackStatus === 'error' && <div className="feedback-error">{feedbackMsg}</div>}
+              {feedbackStatus === 'success' && <div className="feedback-success">{feedbackMsg}</div>}
+              <div className="feedback-form-actions">
+                <button type="button" onClick={closeFeedback} className="feedback-cancel">取消</button>
+                <button type="submit" disabled={feedbackSubmitting} className="feedback-submit">{feedbackSubmitting ? '提交中...' : '提交反馈'}</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
-      {view === 'search' && (
-        <>
-          <div className="main-searchbar-outer">
-            <SearchBar
-              query={keyword}
-              onQueryChange={setKeyword}
-              onSearch={handleHomeSearch}
-            />
-            <HomeFilters
-              cloudDiskType={cloudDiskType}
-              fileType={fileType}
-              timeRange={timeRange}
-              exactMatch={exactMatch}
-              onChange={updateFilter}
-              onReset={resetFilters}
-            />
-          </div>
-          {/* 筛选面板 - 集成新的FilterPanel组件 */}
-          {/* 搜索页不再显示筛选条，筛选已移至首页 */}
 
-          {/* 高级过滤器 */}
-          {/* {searched && (
-            <FilterBar
-              panType={panType}
-              onPanTypeChange={setPanType}
-              fileType={fileType}
-              onFileTypeChange={setFileType}
-              exactMatch={exactMatch}
-              onExactMatchChange={setExactMatch}
-              timeFilter={timeFilter}
-              onTimeFilterChange={setTimeFilter}
-            />
-          )} */}
-
-          {/* 搜索结果统计 */}
-          {searched && (
-            <div className="search-stats">
-              搜索 <span className="highlight">{keyword}</span> 的结果，共 <span className="highlight">{totalCount}</span> 条
-            </div>
-          )}
-          {/* 搜索结果列表 */}
-          {mappedResults.length > 0 && (
-            <div className="results">
-              <ResultList
-                results={mappedResults}
-                onOpenLink={handleOpenLink}
-                onCopyLink={handleCopyLink}
-                onFeedback={openFeedback}
-                isLoading={isLoading || globalActionLoading}
-                actionLoading={isLoading || globalActionLoading}
-                feedbackDoneIds={feedbackDoneIds}
-                formatDate={formatDate}
-              />
-            </div>
-          )}
-          {/* 无搜索结果提示 */}
-          {searched && mappedResults.length === 0 && !isLoading && (
-            <div className="no-results">
-              未找到相关资源
-            </div>
-          )}
-          {/* 加载中提示 */}
-          {isLoading && (
-            <div className="loading">
-              <div className="loading-spinner"></div>
-              <div>搜索中，请稍候...</div>
-            </div>
-          )}
-          {/* 分页控件 */}
-          {mappedResults.length > 0 && renderPagination()}
-          {/* 资源失效反馈弹窗 */}
-          {feedbackOpen && feedbackResource && (
-            <div className="feedback-modal-bg">
-              <div className="feedback-modal">
-                <div className="feedback-modal-header">
-                  <span>资源失效反馈</span>
-                  <button className="feedback-modal-close" onClick={closeFeedback}>×</button>
-                </div>
-                <form className="feedback-form" onSubmit={submitFeedback}>
-                  <div className="feedback-form-group">
-                    <label>失效类型 <span style={{color:'red'}}>*</span></label>
-                    <select value={feedbackForm.invalid_type} onChange={e=>setFeedbackForm(f=>({...f,invalid_type:Number(e.target.value)}))} required>
-                      <option value={1}>链接错误</option>
-                      <option value={2}>资源失效</option>
-                      <option value={3}>文件不存在</option>
-                    </select>
-                  </div>
-                  <div className="feedback-form-group">
-                    <label>补充说明</label>
-                    <textarea value={feedbackForm.description} onChange={e=>setFeedbackForm(f=>({...f,description:e.target.value}))} placeholder="请详细描述资源失效的具体情况..." rows={3} />
-                  </div>
-                  <div className="feedback-form-group">
-                    <label>联系方式</label>
-                    <input type="text" value={feedbackForm.contact_info} onChange={e=>setFeedbackForm(f=>({...f,contact_info:e.target.value}))} placeholder="您的邮箱或其他联系方式（选填）" />
-                  </div>
-                  {feedbackStatus === 'error' && <div className="feedback-error">{feedbackMsg}</div>}
-                  {feedbackStatus === 'success' && <div className="feedback-success">{feedbackMsg}</div>}
-                  <div className="feedback-form-actions">
-                    <button type="button" onClick={closeFeedback} className="feedback-cancel">取消</button>
-                    <button type="submit" disabled={feedbackSubmitting} className="feedback-submit">{feedbackSubmitting ? '提交中...' : '提交反馈'}</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-          {/* 右上角资源已删除提示 */}
-          {deletedResourceMsg && (
-            <div style={{position:'fixed',top:60,right:24,zIndex:9999,background:'#fffbe6',color:'#faad14',padding:'10px 18px',borderRadius:8,boxShadow:'0 2px 8px rgba(0,0,0,0.08)',fontWeight:500}}>
-              {deletedResourceMsg}
-            </div>
-          )}
-        </>
+      {/* 右上角资源已删除提示 */}
+      {deletedResourceMsg && (
+        <div style={{position:'fixed',top:60,right:24,zIndex:9999,background:'#fffbe6',color:'#faad14',padding:'10px 18px',borderRadius:8,boxShadow:'0 2px 8px rgba(0,0,0,0.08)',fontWeight:500}}>
+          {deletedResourceMsg}
+        </div>
       )}
-          {/* 页脚始终渲染在container内，主站风格 */}
-          <footer className="apple-footer">
-            <div className="footer-main">
+
+      {/* 页脚 */}
+      <footer className="apple-footer">
+        <div className="footer-main">
           <div className="footer-stats">
             <span className="footer-stat-item"><svg className="footer-icon" viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M4.5 4.5A1.5 1.5 0 0 1 6 3h8a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 14 18H6a1.5 1.5 0 0 1-1.5-1.5v-12Z" stroke="#2997ff" strokeWidth="1.2"/><path d="M7 7h6M7 10h6M7 13h4" stroke="#2997ff" strokeWidth="1.2" strokeLinecap="round"/></svg> 资源总数: <b>{footerStats.total.toLocaleString()}</b></span>
             <span className="footer-stat-item"><svg className="footer-icon" viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M10 2v8l6 3.5" stroke="#2997ff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="10" cy="10" r="8.5" stroke="#2997ff" strokeWidth="1.2"/></svg> 昨日新增: <b>{footerStats.yesterday.toLocaleString()}</b></span>
@@ -709,8 +431,16 @@ function App() {
           <span className="footer-origin-link"> | <a href="https://pansoo.cn/" target="_blank" rel="noopener noreferrer">97盘搜</a></span>
         </div>
       </footer>
+
+      {/* 回到顶部按钮 */}
+      <button 
+        className={`back-to-top ${showBackToTop ? 'visible' : ''}`}
+        onClick={scrollToTop}
+        title="回到顶部"
+      >
+        ↑
+      </button>
     </div>
   );
 }
 
-export default App;

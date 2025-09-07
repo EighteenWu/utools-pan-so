@@ -7,7 +7,7 @@
 一个基于 [97网盘资源搜索](https://pansoo.cn/) 官方网站 1:1 完全还原的 uTools 插件，支持搜索百度网盘、夸克网盘、阿里云盘、迅雷网盘等多种网盘资源。
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](plugin.json)
+[![Version](https://img.shields.io/badge/version-1.0.7-green.svg)](public/plugin.json)
 [![React](https://img.shields.io/badge/react-18.2.0-blue.svg)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/vite-5.0.0-orange.svg)](https://vitejs.dev/)
 
@@ -169,3 +169,10 @@ npm run preview
 Made with ❤️ by [EighteenWu](https://github.com/EighteenWu)
 
 </div>
+
+## 结构调整说明
+
+- 移除根目录 `plugin.json`，避免与 `dist/plugin.json` 冲突。
+- 开发：导入 `public/` 作为本地插件，读取 `public/plugin.json` 的 `development.main`。
+- 生产：运行 `npm run build` 后，导入 `dist/` 作为本地插件（包含打包后的 `plugin.json`）。
+- 预加载：`public/preload/services.js` 作为唯一预加载入口，并在 `development` 中显式声明。

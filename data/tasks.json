@@ -1,0 +1,139 @@
+{
+  "tasks": [
+    {
+      "id": "5b6a8d9a-f0f1-465e-851e-8a803ba72cde",
+      "name": "重构App.jsx顶部布局结构",
+      "description": "修改App.jsx中的JSX结构，将页面标题、搜索栏、筛选栏整合到一行显示。创建.top-header-row容器，包含三个子区域：.header-title、.search-section、.filters-section，替换现有的分离式布局。",
+      "notes": "保持现有组件的API不变，仅修改布局结构。确保SearchBar和HomeFilters组件的所有props正确传递。",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-09-07T00:55:17.548Z",
+      "updatedAt": "2025-09-07T01:02:10.554Z",
+      "relatedFiles": [
+        {
+          "path": "src/App.jsx",
+          "type": "TO_MODIFY",
+          "description": "主应用组件，需要修改顶部布局结构",
+          "lineStart": 498,
+          "lineEnd": 584
+        }
+      ],
+      "implementationGuide": "1. 在App.jsx的return语句中，替换现有的header-bar和main-searchbar-outer结构\\n2. 创建新的.top-header-row容器\\n3. 将现有的logo-text、SearchBar组件、HomeFilters组件按顺序放入对应的子容器中\\n4. 确保onClick事件和所有props正确传递给子组件\\n5. 移除原有的重复搜索栏代码",
+      "verificationCriteria": "验证标题、搜索栏、筛选栏在一行正确显示，所有交互功能正常工作，响应式布局在移动端正确降级为垂直堆叠",
+      "analysisResult": "基于现有React组件和苹果设计系统，通过CSS Grid和Flexbox布局重构，实现标题/搜索/筛选一行显示、卡片网格化和三角形反馈按钮的UI优化",
+      "summary": "任务已完成。App.jsx中的顶部布局结构已正确重构：创建了.top-header-row容器，包含.header-title、.search-section、.filters-section三个子区域，所有组件props和事件处理正确传递，旧的分离式布局结构已被禁用。布局结构符合设计要求，为后续CSS样式实现奠定了基础。",
+      "completedAt": "2025-09-07T01:02:10.549Z"
+    },
+    {
+      "id": "427053e1-a24a-4e4c-a33b-b0b95eee4718",
+      "name": "实现顶部一行布局CSS样式",
+      "description": "在index.css中添加.top-header-row及其子元素的CSS样式，实现三栏布局。使用Flexbox布局，左侧固定宽度标题，中间自适应搜索栏，右侧固定宽度筛选区域。包含响应式设计，768px以下改为垂直堆叠。",
+      "notes": "使用现有的CSS变量如--apple-spacing-4, --apple-font-size-title-2等，保持设计一致性。",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "5b6a8d9a-f0f1-465e-851e-8a803ba72cde"
+        }
+      ],
+      "createdAt": "2025-09-07T00:55:17.548Z",
+      "updatedAt": "2025-09-07T01:05:31.077Z",
+      "relatedFiles": [
+        {
+          "path": "src/index.css",
+          "type": "TO_MODIFY",
+          "description": "主样式文件，需要添加顶部布局相关样式",
+          "lineStart": 38,
+          "lineEnd": 93
+        }
+      ],
+      "implementationGuide": "1. 在index.css中添加.top-header-row样式：display: flex, align-items: center, gap设置\\n2. 设置.header-title: flex-shrink: 0, min-width: 100px\\n3. 设置.search-section: flex: 1, min-width: 300px\\n4. 设置.filters-section: flex-shrink: 0, min-width: 200px\\n5. 添加@media (max-width: 768px)响应式规则，改为flex-direction: column\\n6. 确保与现有苹果设计系统CSS变量兼容",
+      "verificationCriteria": "验证三栏布局在桌面端正确显示，各区域宽度合理分配，移动端响应式布局正常工作，样式与现有设计系统保持一致",
+      "analysisResult": "基于现有React组件和苹果设计系统，通过CSS Grid和Flexbox布局重构，实现标题/搜索/筛选一行显示、卡片网格化和三角形反馈按钮的UI优化",
+      "summary": "顶部一行布局CSS样式已完成。实现了.top-header-row的Flexbox布局，包含.header-title、.search-section、.filters-section的合理布局配置，响应式设计在768px以下正确切换为垂直堆叠，使用了现有的苹果设计系统CSS变量保持一致性。",
+      "completedAt": "2025-09-07T01:05:31.073Z"
+    },
+    {
+      "id": "6e72fd06-9988-4f45-920e-6de4407aff0b",
+      "name": "优化资源卡片网格布局",
+      "description": "修改.results容器的CSS样式，从垂直堆叠改为CSS Grid网格布局，实现一行显示两个资源卡片。设置合适的网格参数和间距，同时保持响应式设计确保移动端单列显示。",
+      "notes": "网格最小宽度400px确保卡片内容可读性，auto-fit实现自适应列数。移除卡片底部margin避免与grid gap重复。",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-09-07T00:55:17.548Z",
+      "updatedAt": "2025-09-07T01:07:06.791Z",
+      "relatedFiles": [
+        {
+          "path": "src/index.css",
+          "type": "TO_MODIFY",
+          "description": "主样式文件，需要修改.results和.card-pansoo相关样式",
+          "lineStart": 287,
+          "lineEnd": 300
+        },
+        {
+          "path": "src/index.css",
+          "type": "TO_MODIFY",
+          "description": "资源卡片样式定义",
+          "lineStart": 482,
+          "lineEnd": 491
+        }
+      ],
+      "implementationGuide": "1. 在index.css中修改.results样式，添加display: grid\\n2. 设置grid-template-columns: repeat(auto-fit, minmax(400px, 1fr))\\n3. 设置适当的gap值使用--apple-spacing-4\\n4. 添加移动端响应式规则@media (max-width: 768px)改为单列\\n5. 修改.card-pansoo样式，移除margin-bottom改为使用gap间距\\n6. 确保卡片hover效果和其他交互保持不变",
+      "verificationCriteria": "验证桌面端一行显示两个卡片，卡片间距合适，移动端单列显示，所有卡片交互效果正常工作",
+      "analysisResult": "基于现有React组件和苹果设计系统，通过CSS Grid和Flexbox布局重构，实现标题/搜索/筛选一行显示、卡片网格化和三角形反馈按钮的UI优化",
+      "summary": "资源卡片网格布局优化完成。设置了CSS Grid布局，使用repeat(auto-fit, minmax(350px, 1fr))确保一行显示两个卡片，设置了适当的gap间距，移动端响应式规则正确实现单列显示。调整了最小宽度从400px到350px以适应更多屏幕尺寸。",
+      "completedAt": "2025-09-07T01:07:06.771Z"
+    },
+    {
+      "id": "151628bf-2130-4c52-8066-5748cd124cbe",
+      "name": "实现三角形反馈按钮组件",
+      "description": "修改ResultList.jsx中的资源失效反馈按钮，将原有的文字按钮替换为三角形图标按钮。使用SVG三角形图标，添加hover提示效果，保持原有的点击反馈功能逻辑不变。",
+      "notes": "SVG图标使用fill和stroke属性，颜色使用#f59e42保持与原设计一致。确保按钮有足够的点击区域。",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-09-07T00:55:17.548Z",
+      "updatedAt": "2025-09-07T01:08:29.827Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/ResultList.jsx",
+          "type": "TO_MODIFY",
+          "description": "资源列表组件，需要修改反馈按钮结构",
+          "lineStart": 59,
+          "lineEnd": 90
+        }
+      ],
+      "implementationGuide": "1. 在ResultList.jsx中替换现有的.card-feedback-btn结构\\n2. 创建新的.card-feedback-triangle-btn按钮\\n3. 使用SVG绘制三角形图标，内含感叹号表示警告\\n4. 添加title属性实现hover提示文字\\n5. 区分已反馈和未反馈两种状态的视觉效果\\n6. 保持onClick事件和disabled逻辑不变\\n7. 使用.card-feedback-wrapper容器实现居中对齐",
+      "verificationCriteria": "验证三角形按钮正确显示，hover时显示提示文字，点击后反馈功能正常工作，已反馈状态正确显示",
+      "analysisResult": "基于现有React组件和苹果设计系统，通过CSS Grid和Flexbox布局重构，实现标题/搜索/筛选一行显示、卡片网格化和三角形反馈按钮的UI优化",
+      "summary": "三角形反馈按钮组件实现完成。将反馈按钮移动到card-actions容器内，与\"打开\"和\"复制链接\"按钮并排显示。使用SVG三角形图标，包含感叹号警告标识，保持了onClick事件和disabled逻辑，实现了已反馈和未反馈两种状态的视觉区分，添加了title提示功能。",
+      "completedAt": "2025-09-07T01:08:29.822Z"
+    },
+    {
+      "id": "8e91cdd7-e132-4614-a86e-6ca994a4137e",
+      "name": "添加三角形反馈按钮CSS样式",
+      "description": "在index.css中添加三角形反馈按钮的完整样式定义，包括基础样式、hover效果、active状态、disabled状态等。实现与现有设计系统一致的视觉效果和交互反馈。",
+      "notes": "使用现有的CSS变量如--apple-duration-fast, --apple-ease-standard等实现一致的动画效果。hover背景色使用rgba(245, 158, 66, 0.1)。",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "151628bf-2130-4c52-8066-5748cd124cbe"
+        }
+      ],
+      "createdAt": "2025-09-07T00:55:17.548Z",
+      "updatedAt": "2025-09-07T01:10:51.822Z",
+      "relatedFiles": [
+        {
+          "path": "src/index.css",
+          "type": "TO_MODIFY",
+          "description": "主样式文件，需要添加三角形按钮相关样式",
+          "lineStart": 657,
+          "lineEnd": 697
+        }
+      ],
+      "implementationGuide": "1. 在index.css中添加.card-feedback-wrapper样式实现居中布局\\n2. 添加.card-feedback-triangle-btn基础样式：透明背景、无边框、合适内边距\\n3. 实现hover效果：背景色变化、轻微放大(scale)\\n4. 添加active状态的缩小效果\\n5. 定义disabled状态的透明度和cursor样式\\n6. 添加.feedback-done状态的特殊样式\\n7. 定义.triangle-icon的flex布局样式",
+      "verificationCriteria": "验证按钮样式与设计系统一致，hover和active效果流畅自然，已反馈状态视觉区分明显，动画过渡效果符合苹果设计规范",
+      "analysisResult": "基于现有React组件和苹果设计系统，通过CSS Grid和Flexbox布局重构，实现标题/搜索/筛选一行显示、卡片网格化和三角形反馈按钮的UI优化",
+      "summary": "三角形反馈按钮CSS样式完成。更新了样式以适配在card-actions容器内的布局，添加了边框使其与其他按钮保持一致，实现了hover、active、disabled和feedback-done等状态的完整样式定义，使用了现有的苹果设计系统CSS变量，动画效果流畅自然。",
+      "completedAt": "2025-09-07T01:10:51.816Z"
+    }
+  ]
+}
