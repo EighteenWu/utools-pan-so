@@ -278,6 +278,28 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // 加载页脚统计数据
+  const loadFooterStats = useCallback(async () => {
+    try {
+      const res = await fetch('https://pansoo.cn/api/resource_stats');
+      const data = await res.json();
+      if (data.status === 'success') {
+        setFooterStats({
+          total: data.total || 0,
+          yesterday: data.yesterday || 0
+        });
+      }
+    } catch (error) {
+      console.error('加载统计数据失败:', error);
+      // 保持默认值，不影响页面正常使用
+    }
+  }, []);
+
+  // 页面加载时获取统计数据
+  useEffect(() => {
+    loadFooterStats();
+  }, [loadFooterStats]);
+
   return (
     <div className="container">
       {/* Header */}

@@ -83,7 +83,7 @@ npm run preview
 ## MCP Rules (Codex MCP 调用规则)
 
 ### 目标
-- 为 Codex CLI 提供三项 MCP 服务（Sequential Thinking、DuckDuckGo、Context7）的选择与调用规范，强制使用MCP服务，控制查询粒度、速率与输出格式，保证可追溯与安全。
+- 为 Claude code CLI 提供以下的MCP的选择与调用规范，强制使用MCP服务，控制查询粒度、速率与输出格式，保证可追溯与安全。
 
 ### 全局策略
 - 工具选择：根据任务意图选择最匹配的 MCP 服务；避免无意义并发调用。
